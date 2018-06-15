@@ -1,0 +1,10 @@
+cache/
+
+node_modules/
+
+npm-debug.log
+
+/.idea/workspace.xml
+/.idea/tasks.xml
+/.idea/watcherTasks.xml
+.idea/dictionaries

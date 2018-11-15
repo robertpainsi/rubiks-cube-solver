@@ -1,30 +1,63 @@
 'use strict';
 
-const createSide = (() => {
-    const isIndex = (s) => /^\d+$/.test(s);
+const createList = (() => {
+    const isIndex = (s) => (typeof s === 'string' || s instanceof String) && /^\d+$/.test(s);
     const handler = {
-        set: (obj, prop, value) => isIndex(prop) ? obj[prop - 1] = value : obj[prop] = value,
-        get: (obj, prop) => isIndex(prop) ? obj[prop - 1] : obj[prop],
+        apply: function (target, thisArg, argumentsList) {
+            return target(argumentsList[0], argumentsList[1]) * 10;
+        },
+        deleteProperty(target, prop) {
+            if (isIndex(prop)) {
+                for (let i = parseInt(prop); i < target.length; i++) {
+                    target[i - 1] = target[i];
+                }
+                target.length--;
+                return true;
+            } else {
+                return delete target[prop];
+            }
+        },
+        set: (obj, prop, value) => {
+            if (isIndex(prop)) {
+                return obj[prop - 1] = value;
+            } else {
+                return obj[prop] = value;
+            }
+        },
+        get: (obj, prop) => {
+            if (prop === 'push') {
+                return function (v) {
+                    obj[obj.length] = v;
+                }
+            } else if (prop === 'length') {
+                return obj.length;
+            } else {
+                return isIndex(prop) ? obj[prop - 1] : obj[prop];
+            }
+        }
     };
 
-    return (side) => new Proxy(side, handler);
+    return (side) => new Proxy(side || [], handler);
 })();
 
 
 const $ = {
-    F: createSide([`y`, `r`, `g`, `r`, `w`, `o`, `o`, `o`, `w`,]),
-    B: createSide([`y`, `r`, `y`, `b`, `y`, `b`, `b`, `b`, `o`,]),
-    L: createSide([`r`, `w`, `r`, `y`, `b`, `y`, `w`, `r`, `y`,]),
-    R: createSide([`r`, `y`, `b`, `w`, `g`, `o`, `o`, `g`, `w`,]),
-    U: createSide([`g`, `b`, `o`, `g`, `r`, `g`, `b`, `g`, `w`,]),
-    D: createSide([`g`, `y`, `b`, `w`, `o`, `o`, `g`, `w`, `r`,]),
+    F: createList([`y`, `r`, `g`, `r`, `w`, `o`, `o`, `o`, `w`,]),
+    B: createList([`y`, `r`, `y`, `b`, `y`, `b`, `b`, `b`, `o`,]),
+    L: createList([`r`, `w`, `r`, `y`, `b`, `y`, `w`, `r`, `y`,]),
+    R: createList([`r`, `y`, `b`, `w`, `g`, `o`, `o`, `g`, `w`,]),
+    U: createList([`g`, `b`, `o`, `g`, `r`, `g`, `b`, `g`, `w`,]),
+    D: createList([`g`, `y`, `b`, `w`, `o`, `o`, `g`, `w`, `r`,]),
 
-    FB: createSide([]),
-    BB: createSide([]),
-    LB: createSide([]),
-    RB: createSide([]),
-    UB: createSide([]),
-    DB: createSide([]),
+    FB: createList(),
+    BB: createList(),
+    LB: createList(),
+    RB: createList(),
+    UB: createList(),
+    DB: createList(),
+
+    commands: createList(),
+    commandText: '',
 };
 const logCube = () => {
     const sideToArray = (side) => {
@@ -50,6 +83,46 @@ const logCube = () => {
 const direction = {
     cw: 0,
     ccw: 1,
+};
+
+const parseCommands = () => {
+    while ($.commands.length) {
+        delete $.commands[1];
+    }
+    let insertNewItem = true;
+    for (let i = 0; i < $.commandText.length; i++) { // TODO: Adapt to PC text indices
+        let c = $.commandText[i];
+        if (c === ' ') {
+            insertNewItem = true;
+        } else {
+            if (insertNewItem) {
+                $.commands.push(c);
+                insertNewItem = false;
+            } else {
+                $.commands[$.commands.length] = $.commands[$.commands.length] + c;
+            }
+        }
+    }
+    $.commandText = '';
+};
+
+const executeCommands = () => {
+    parseCommands();
+    while ($.commands.length) {
+        if ($.commands[1] === 'TA') {
+            // console.log('TA');
+            TA();
+        } else if ($.commands[1] === 'TB') {
+            // console.log('TB');
+            TB();
+        } else if ($.commands[1] === 'TAHB') {
+            // console.log('TAHB');
+            TAHB();
+        } else {
+            console.error('Unknown command', );
+        }
+        delete $.commands[1];
+    }
 };
 
 const backup = () => {
@@ -196,19 +269,8 @@ const TAHB = () => {
 
 logCube();
 backup();
-let commands = `TAHB TA TAHB TAHB TB TAHB`;
-commands.split(` `).forEach((command) => {
-    switch (command) {
-        case `TA`:
-            TA();
-            break;
-        case `TB`:
-            TB();
-            break;
-        case `TAHB`:
-            TAHB();
-            break;
-    }
-});
+
+$.commandText = `TAHB TA TAHB TAHB TB TAHB`;
+executeCommands();
 
 logCube();

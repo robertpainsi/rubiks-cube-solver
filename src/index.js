@@ -42,12 +42,19 @@ const createList = (() => {
 
 
 const $ = {
-    F: createList([`y`, `r`, `g`, `r`, `w`, `o`, `o`, `o`, `w`,]),
-    B: createList([`y`, `r`, `y`, `b`, `y`, `b`, `b`, `b`, `o`,]),
-    L: createList([`r`, `w`, `r`, `y`, `b`, `y`, `w`, `r`, `y`,]),
-    R: createList([`r`, `y`, `b`, `w`, `g`, `o`, `o`, `g`, `w`,]),
-    U: createList([`g`, `b`, `o`, `g`, `r`, `g`, `b`, `g`, `w`,]),
-    D: createList([`g`, `y`, `b`, `w`, `o`, `o`, `g`, `w`, `r`,]),
+    // F: createList([`y`, `r`, `g`, `r`, `w`, `o`, `o`, `o`, `w`,]),
+    // B: createList([`y`, `r`, `y`, `b`, `y`, `b`, `b`, `b`, `o`,]),
+    // L: createList([`r`, `w`, `r`, `y`, `b`, `y`, `w`, `r`, `y`,]),
+    // R: createList([`r`, `y`, `b`, `w`, `g`, `o`, `o`, `g`, `w`,]),
+    // U: createList([`g`, `b`, `o`, `g`, `r`, `g`, `b`, `g`, `w`,]),
+    // D: createList([`g`, `y`, `b`, `w`, `o`, `o`, `g`, `w`, `r`,]),
+
+    F: createList([`w`, `w`, `w`, `w`, `w`, `w`, `w`, `w`, `w`,]),
+    B: createList([`y`, `y`, `y`, `y`, `y`, `y`, `y`, `y`, `y`,]),
+    L: createList([`b`, `b`, `b`, `b`, `b`, `b`, `b`, `b`, `b`,]),
+    R: createList([`g`, `g`, `g`, `g`, `g`, `g`, `g`, `g`, `g`,]),
+    U: createList([`r`, `r`, `r`, `r`, `r`, `r`, `r`, `r`, `r`,]),
+    D: createList([`o`, `o`, `o`, `o`, `o`, `o`, `o`, `o`, `o`,]),
 
     FB: createList(),
     BB: createList(),
@@ -78,6 +85,16 @@ const logCube = () => {
     };
     console.log(cube);
     console.log();
+};
+
+const shuffle = () => {
+    const commandsPool = [`TA`, `TB`, `TAHB`];
+    const commands = [];
+    for (let i = 0; i < 256; i++) {
+        commands.push(commandsPool[Math.floor(Math.random() * commandsPool.length)]);
+    }
+    $.commandText = commands.join(' ');
+    executeCommands();
 };
 
 const direction = {
@@ -269,8 +286,6 @@ const TAHB = () => {
 
 logCube();
 backup();
-
-$.commandText = `TAHB TA TAHB TAHB TB TAHB`;
-executeCommands();
+shuffle(); // TODO: Remove
 
 logCube();

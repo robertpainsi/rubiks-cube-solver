@@ -1,45 +1,7 @@
 'use strict';
 
-const createList = (() => {
-    const isIndex = (s) => (typeof s === 'string' || s instanceof String) && /^\d+$/.test(s);
-    const handler = {
-        apply: function (target, thisArg, argumentsList) {
-            return target(argumentsList[0], argumentsList[1]) * 10;
-        },
-        deleteProperty(target, prop) {
-            if (isIndex(prop)) {
-                for (let i = parseInt(prop); i < target.length; i++) {
-                    target[i - 1] = target[i];
-                }
-                target.length--;
-                return true;
-            } else {
-                return delete target[prop];
-            }
-        },
-        set: (obj, prop, value) => {
-            if (isIndex(prop)) {
-                return obj[prop - 1] = value;
-            } else {
-                return obj[prop] = value;
-            }
-        },
-        get: (obj, prop) => {
-            if (prop === 'push') {
-                return function (v) {
-                    obj[obj.length] = v;
-                }
-            } else if (prop === 'length') {
-                return obj.length;
-            } else {
-                return isIndex(prop) ? obj[prop - 1] : obj[prop];
-            }
-        }
-    };
-
-    return (side) => new Proxy(side || [], handler);
-})();
-
+import {createList} from "./pocket_code";
+import {logCube} from "./utils";
 
 const $ = {
     // F: createList([`y`, `r`, `g`, `r`, `w`, `o`, `o`, `o`, `w`,]),
@@ -66,25 +28,10 @@ const $ = {
     commands: createList(),
     commandText: '',
 };
-const logCube = () => {
-    const sideToArray = (side) => {
-        const result = [];
-        result.push(side.slice(1, 4));
-        result.push(side.slice(4, 7));
-        result.push(side.slice(7, 10));
-        result[2][2] = side[9];
-        return result;
-    };
-    const cube = {
-        F: sideToArray($.F),
-        B: sideToArray($.B),
-        L: sideToArray($.L),
-        R: sideToArray($.R),
-        U: sideToArray($.U),
-        D: sideToArray($.D),
-    };
-    console.log(cube);
-    console.log();
+
+const direction = {
+    cw: 0,
+    ccw: 1,
 };
 
 const shuffle = () => {
@@ -95,11 +42,6 @@ const shuffle = () => {
     }
     $.commandText = commands.join(' ');
     executeCommands();
-};
-
-const direction = {
-    cw: 0,
-    ccw: 1,
 };
 
 const parseCommands = () => {
@@ -284,8 +226,8 @@ const TAHB = () => {
     restore();
 };
 
-logCube();
 backup();
 shuffle(); // TODO: Remove
+logCube($);
 
-logCube();
+logCube($);

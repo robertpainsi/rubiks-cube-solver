@@ -1,34 +1,47 @@
 'use strict';
 
-const $ = {
-    // F: [`w`, `w`, `w`, `w`, `w`, `w`, `w`, `w`, `w`],
-    // B: [`y`, `y`, `y`, `y`, `y`, `y`, `y`, `y`, `y`],
-    // L: [`b`, `b`, `b`, `b`, `b`, `b`, `b`, `b`, `b`],
-    // R: [`g`, `g`, `g`, `g`, `g`, `g`, `g`, `g`, `g`],
-    // U: [`o`, `o`, `o`, `o`, `o`, `o`, `o`, `o`, `o`],
-    // D: [`r`, `r`, `r`, `r`, `r`, `r`, `r`, `r`, `r`],
-    F: [`y`, `r`, `g`, `r`, `w`, `o`, `o`, `o`, `w`,],
-    B: [`y`, `r`, `y`, `b`, `y`, `b`, `b`, `b`, `o`,],
-    L: [`r`, `w`, `r`, `y`, `b`, `y`, `w`, `r`, `y`,],
-    R: [`r`, `y`, `b`, `w`, `g`, `o`, `o`, `g`, `w`,],
-    U: [`g`, `b`, `o`, `g`, `r`, `g`, `b`, `g`, `w`,],
-    D: [`g`, `y`, `b`, `w`, `o`, `o`, `g`, `w`, `r`,],
+const createSide = (() => {
+    const isIndex = (s) => /^\d+$/.test(s);
+    const handler = {
+        set: (obj, prop, value) => isIndex(prop) ? obj[prop - 1] = value : obj[prop] = value,
+        get: (obj, prop) => isIndex(prop) ? obj[prop - 1] : obj[prop],
+    };
 
-    FB: [],
-    BB: [],
-    LB: [],
-    RB: [],
-    UB: [],
-    DB: [],
+    return (side) => new Proxy(side, handler);
+})();
+
+
+const $ = {
+    F: createSide([`y`, `r`, `g`, `r`, `w`, `o`, `o`, `o`, `w`,]),
+    B: createSide([`y`, `r`, `y`, `b`, `y`, `b`, `b`, `b`, `o`,]),
+    L: createSide([`r`, `w`, `r`, `y`, `b`, `y`, `w`, `r`, `y`,]),
+    R: createSide([`r`, `y`, `b`, `w`, `g`, `o`, `o`, `g`, `w`,]),
+    U: createSide([`g`, `b`, `o`, `g`, `r`, `g`, `b`, `g`, `w`,]),
+    D: createSide([`g`, `y`, `b`, `w`, `o`, `o`, `g`, `w`, `r`,]),
+
+    FB: createSide([]),
+    BB: createSide([]),
+    LB: createSide([]),
+    RB: createSide([]),
+    UB: createSide([]),
+    DB: createSide([]),
 };
 const logCube = () => {
+    const sideToArray = (side) => {
+        const result = [];
+        result.push(side.slice(1, 4));
+        result.push(side.slice(4, 7));
+        result.push(side.slice(7, 10));
+        result[2][2] = side[9];
+        return result;
+    };
     const cube = {
-        F: [$.F.slice(0, 3), $.F.slice(3, 6), $.F.slice(6, 9)],
-        B: [$.B.slice(0, 3), $.B.slice(3, 6), $.B.slice(6, 9)],
-        L: [$.L.slice(0, 3), $.L.slice(3, 6), $.L.slice(6, 9)],
-        R: [$.R.slice(0, 3), $.R.slice(3, 6), $.R.slice(6, 9)],
-        U: [$.U.slice(0, 3), $.U.slice(3, 6), $.U.slice(6, 9)],
-        D: [$.D.slice(0, 3), $.D.slice(3, 6), $.D.slice(6, 9)],
+        F: sideToArray($.F),
+        B: sideToArray($.B),
+        L: sideToArray($.L),
+        R: sideToArray($.R),
+        U: sideToArray($.U),
+        D: sideToArray($.D),
     };
     console.log(cube);
     console.log();
@@ -41,23 +54,23 @@ const direction = {
 
 const backup = () => {
     for (let i = 1; i <= 9; i++) {
-        $.FB[i - 1] = $.F[i - 1];
-        $.BB[i - 1] = $.B[i - 1];
-        $.LB[i - 1] = $.L[i - 1];
-        $.RB[i - 1] = $.R[i - 1];
-        $.UB[i - 1] = $.U[i - 1];
-        $.DB[i - 1] = $.D[i - 1];
+        $.FB[i] = $.F[i];
+        $.BB[i] = $.B[i];
+        $.LB[i] = $.L[i];
+        $.RB[i] = $.R[i];
+        $.UB[i] = $.U[i];
+        $.DB[i] = $.D[i];
     }
 };
 
 const restore = () => {
     for (let i = 1; i <= 9; i++) {
-        $.F[i - 1] = $.FB[i - 1];
-        $.B[i - 1] = $.BB[i - 1];
-        $.L[i - 1] = $.LB[i - 1];
-        $.R[i - 1] = $.RB[i - 1];
-        $.U[i - 1] = $.UB[i - 1];
-        $.D[i - 1] = $.DB[i - 1];
+        $.F[i] = $.FB[i];
+        $.B[i] = $.BB[i];
+        $.L[i] = $.LB[i];
+        $.R[i] = $.RB[i];
+        $.U[i] = $.UB[i];
+        $.D[i] = $.DB[i];
     }
 };
 
@@ -105,14 +118,14 @@ const TA = () => {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
             let newIndex = 9 - (3 * (k - 1)) - (3 - i);
-            $.FB[index - 1] = $.F[newIndex - 1];
-            $.LB[index - 1] = $.D[newIndex - 1];
-            $.RB[index - 1] = $.U[newIndex - 1];
-            $.UB[index - 1] = $.L[newIndex - 1];
-            $.DB[index - 1] = $.R[newIndex - 1];
+            $.FB[index] = $.F[newIndex];
+            $.LB[index] = $.D[newIndex];
+            $.RB[index] = $.U[newIndex];
+            $.UB[index] = $.L[newIndex];
+            $.DB[index] = $.R[newIndex];
 
             newIndex = k * 3 - (i - 1);
-            $.BB[index - 1] = $.B[newIndex - 1];
+            $.BB[index] = $.B[newIndex];
         }
     }
     restore();
@@ -131,15 +144,15 @@ const TB = () => {
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
-            $.FB[index - 1] = $.L[index - 1];
-            $.BB[index - 1] = $.R[index - 1];
-            $.LB[index - 1] = $.B[index - 1];
-            $.RB[index - 1] = $.F[index - 1];
+            $.FB[index] = $.L[index];
+            $.BB[index] = $.R[index];
+            $.LB[index] = $.B[index];
+            $.RB[index] = $.F[index];
 
             let newIndex = k * 3 - (i - 1);
-            $.UB[index - 1] = $.U[newIndex - 1];
+            $.UB[index] = $.U[newIndex];
             newIndex = 9 - (3 * (k - 1)) - (3 - i);
-            $.DB[index - 1] = $.D[newIndex - 1];
+            $.DB[index] = $.D[newIndex];
         }
     }
     restore();
@@ -157,27 +170,27 @@ const TAHB = () => {
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
-            $.BB[index - 1] = $.B[index - 1];
+            $.BB[index] = $.B[index];
             let newIndex = 9 - (3 * (k - 1)) - (3 - i);
-            $.FB[index - 1] = $.F[newIndex - 1];
+            $.FB[index] = $.F[newIndex];
         }
     }
 
-    $.LB[3 - 1] = $.D[1 - 1];
-    $.LB[6 - 1] = $.D[2 - 1];
-    $.LB[9 - 1] = $.D[3 - 1];
+    $.LB[3] = $.D[1];
+    $.LB[6] = $.D[2];
+    $.LB[9] = $.D[3];
 
-    $.RB[1 - 1] = $.U[7 - 1];
-    $.RB[4 - 1] = $.U[8 - 1];
-    $.RB[7 - 1] = $.U[9 - 1];
+    $.RB[1] = $.U[7];
+    $.RB[4] = $.U[8];
+    $.RB[7] = $.U[9];
 
-    $.UB[7 - 1] = $.L[9 - 1];
-    $.UB[8 - 1] = $.L[6 - 1];
-    $.UB[9 - 1] = $.L[3 - 1];
+    $.UB[7] = $.L[9];
+    $.UB[8] = $.L[6];
+    $.UB[9] = $.L[3];
 
-    $.DB[1 - 1] = $.R[7 - 1];
-    $.DB[2 - 1] = $.R[4 - 1];
-    $.DB[3 - 1] = $.R[1 - 1];
+    $.DB[1] = $.R[7];
+    $.DB[2] = $.R[4];
+    $.DB[3] = $.R[1];
     restore();
 };
 

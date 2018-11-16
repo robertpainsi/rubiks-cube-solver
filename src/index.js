@@ -309,6 +309,10 @@ while ($.F[2] !== `w` || $.F[4] !== `w` || $.F[6] !== `w` || $.F[8] !== `w`) {
 }
 logCube($);
 
+if (!($.F[5] === `y` && $.F[2] === `w` && $.F[4] === `w` && $.F[6] === `w` && $.F[8] === `w`)) {
+    console.error(`Wrong white daisy!`);
+}
+
 // Finish white cross
 for (let i = 0; i < 4; i++) { // repeat 4 times
     while (!($.F[8] === `w` && $.D[2] === $.D[5])) {
@@ -318,6 +322,16 @@ for (let i = 0; i < 4; i++) { // repeat 4 times
 }
 executeCommands($.commandText = `TB TB`);
 logCube($);
+
+if (!($.B[5] === `y`
+        && $.F[2] === `w` && $.F[4] === `w` && $.F[5] === `w` && $.F[6] === `w` && $.F[8] === `w`
+        && $.L[5] === $.L[6]
+        && $.R[5] === $.R[4]
+        && $.U[5] === $.U[8]
+        && $.D[5] === $.D[2]
+    )) {
+    console.error(`Wrong white cross!`);
+}
 
 console.log('DONE!');
 logCube($);

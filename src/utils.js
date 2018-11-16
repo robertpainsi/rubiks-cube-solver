@@ -1,5 +1,9 @@
 'use strict';
 
+console.error = function (...args) {
+    console.log(`\x1b[31m`, ...args, `\x1b[0m`);
+};
+
 export const logCube = ($) => {
     const sideToArray = (side) => {
         const result = [];

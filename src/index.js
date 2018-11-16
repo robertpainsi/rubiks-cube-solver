@@ -271,6 +271,7 @@ const findSide = () => {
 backup();
 shuffle(); // TODO: Remove
 logCube($);
+
 // Make daisy
 findSide($.searchedSideColor = `y`);
 while ($.F[2] !== `w` || $.F[4] !== `w` || $.F[6] !== `w` || $.F[8] !== `w`) {
@@ -308,6 +309,15 @@ while ($.F[2] !== `w` || $.F[4] !== `w` || $.F[6] !== `w` || $.F[8] !== `w`) {
 }
 logCube($);
 
+// Finish white cross
+for (let i = 0; i < 4; i++) { // repeat 4 times
+    while (!($.F[8] === `w` && $.D[2] === $.D[5])) {
+        executeCommands($.commandText = `TAHB`);
+    }
+    executeCommands($.commandText = `TBHA TBHA TA`);
+}
+executeCommands($.commandText = `TB TB`);
+logCube($);
 
 console.log('DONE!');
 logCube($);

@@ -27,6 +27,8 @@ const $ = {
 
     commands: createList(),
     commandText: '',
+
+    searchedSideColor: 0,
 };
 
 const direction = {
@@ -37,7 +39,7 @@ const direction = {
 const shuffle = () => {
     const commandsPool = [`TA`, `TB`, `TAHB`, `TBHA`];
     const commands = [];
-    for (let i = 0; i < 256; i++) {
+    for (let i = 0; i < 128; i++) {
         commands.push(commandsPool[Math.floor(Math.random() * commandsPool.length)]);
     }
     $.commandText = commands.join(' ');
@@ -252,8 +254,60 @@ const TBHA = () => {
     restore();
 };
 
+const findSide = () => {
+    for (let i = 0; i < 2; i++) { // repeat 2 times
+        for (let j = 0; j < 4; j++) { // repeat 4 times
+            if ($.F[5] === $.searchedSideColor) {
+                return;
+            }
+            $.commandText = `TB`;
+            executeCommands();
+        }
+        $.commandText = `TA`;
+        executeCommands();
+    }
+};
+
 backup();
 shuffle(); // TODO: Remove
 logCube($);
+// Make daisy
+findSide($.searchedSideColor = `y`);
+while ($.F[2] !== `w` || $.F[4] !== `w` || $.F[6] !== `w` || $.F[8] !== `w`) {
+    if ($.B[2] === `w` || $.B[4] === `w` || $.B[6] === `w` || $.B[8] === `w`) {
+        // console.log(`Move white tile from back to yellow front`);
+        executeCommands($.commandText = `TB TB`);
+        while ($.F[8] !== `w`) {
+            executeCommands($.commandText = `TAHB`);
+        }
+        executeCommands($.commandText = `TB TB`);
+        while ($.F[8] === `w`) {
+            executeCommands($.commandText = `TAHB`);
+        }
+        executeCommands($.commandText = `TBHA TBHA`);
+    } else {
+        // console.log(`Move white tile from side to yellow front`);
+        while ($.D[2] !== `w` && $.D[4] !== `w` && $.D[6] !== `w` && $.D[8] !== `w`) {
+            executeCommands($.commandText = `TA`);
+        }
+        while ($.F[8] === `w`) {
+            executeCommands($.commandText = `TAHB`);
+        }
+        while ($.D[4] !== `w`) {
+            executeCommands($.commandText = `TBHA`);
+        }
+        executeCommands($.commandText = `TA TA TA`);
 
+        while ($.F[8] === `w`) { // optional?
+            executeCommands($.commandText = `TAHB`);
+        }
+
+        executeCommands($.commandText = `TBHA TBHA TBHA`);
+    }
+    findSide($.searchedSideColor = `y`);
+}
+logCube($);
+
+
+console.log('DONE!');
 logCube($);

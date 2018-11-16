@@ -42,6 +42,8 @@ export const createList = (() => {
 
 export const repeat = (times, callback) => {
     for (let i = 0; i < times; i++) {
-        callback();
+        if (callback()) {
+            break;
+        }
     }
 };

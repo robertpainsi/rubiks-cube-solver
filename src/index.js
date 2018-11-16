@@ -35,7 +35,7 @@ const direction = {
 };
 
 const shuffle = () => {
-    const commandsPool = [`TA`, `TB`, `TAHB`];
+    const commandsPool = [`TA`, `TB`, `TAHB`, `TBHA`];
     const commands = [];
     for (let i = 0; i < 256; i++) {
         commands.push(commandsPool[Math.floor(Math.random() * commandsPool.length)]);
@@ -77,6 +77,9 @@ const executeCommands = () => {
         } else if ($.commands[1] === 'TAHB') {
             // console.log('TAHB');
             TAHB();
+        } else if ($.commands[1] === 'TBHA') {
+            // console.log('TBHA');
+            TBHA();
         } else {
             console.error('Unknown command', );
         }
@@ -198,11 +201,9 @@ const TAHB = () => {
     holdMotorA();
 
     // TODO: simultaneously
-    backup(); // TODO: Should be optional
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
-            $.BB[index] = $.B[index];
             let newIndex = 9 - (3 * (k - 1)) - (3 - i);
             $.FB[index] = $.F[newIndex];
         }
@@ -223,6 +224,31 @@ const TAHB = () => {
     $.DB[1] = $.R[7];
     $.DB[2] = $.R[4];
     $.DB[3] = $.R[1];
+    restore();
+};
+
+// Turn D clockwise
+const TBHA = () => {
+    turnMotorBClockwise();
+    releaseMotorB();
+    turnMotorBCounterclockwise();
+    holdMotorB();
+
+    // TODO: simultaneously
+    for (let i = 1; i <= 3; i++) {
+        for (let k = 1; k <= 3; k++) {
+            let index = (i - 1) * 3 + k;
+            let newIndex = 9 - (3 * (k - 1)) - (3 - i);
+            $.DB[index] = $.D[newIndex];
+
+            if (index >= 7) {
+                $.FB[index] = $.L[index];
+                $.LB[index] = $.B[index];
+                $.BB[index] = $.R[index];
+                $.RB[index] = $.F[index];
+            }
+        }
+    }
     restore();
 };
 

@@ -39,3 +39,9 @@ export const createList = (() => {
 
     return (side) => new Proxy(side || [], handler);
 })();
+
+export const repeat = (times, callback) => {
+    for (let i = 0; i < times; i++) {
+        callback();
+    }
+};

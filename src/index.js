@@ -380,14 +380,13 @@ const righty = () => {
     executeCommands($.commandText = `TAHB TBHA TAPHB TBPHA`);
 };
 
-console.log('#####################################################################');
 console.log(`Finish white side`);
 const sides = createList([`b`, `o`, `o`, `g`, `g`, `r`, `r`, `b`]);
 for (let i = 1; i <= 4; i++) {
     const c1 = sides[(i - 1) * 2 + 1];
     const c2 = sides[(i - 1) * 2 + 2];
 
-    console.log(`Looking for colors`, colorizeBlock(c1), colorizeBlock(c2));
+    console.log(`Finish edge w`, colorizeBlock(c1), colorizeBlock(c2));
     logCube($);
 
     console.log(`Move away from white side`);
@@ -409,20 +408,14 @@ for (let i = 1; i <= 4; i++) {
         executeCommands($.commandText = `TB`);
     }
     logCube($);
-    console.log(colorizeBlock($.F[5]));
     while (!(
         ($.F[9] === `w` || $.D[3] === `w` || $.R[7] === `w`) &&
         ($.F[9] === c1 || $.D[3] === c1 || $.R[7] === c1) &&
         ($.F[9] === c2 || $.D[3] === c2 || $.R[7] === c2)
     )) {
-        console.log('1', colorizeBlock($.F[9]), colorizeBlock($.D[3]), colorizeBlock($.R[7]));
         executeCommands($.commandText = `TBHA`);
-        logCube($);
-        console.log('2', colorizeBlock($.F[9]), colorizeBlock($.D[3]), colorizeBlock($.R[7]));
-        let i = 0;
     }
     logCube($);
-    console.log(colorizeBlock($.F[9]), colorizeBlock($.D[3]), colorizeBlock($.R[7]));
 
     console.log('Fix white edge');
     while ($.U[9] !== `w` || $.F[3] !== $.F[5] || $.R[1] !== $.R[5]) {
@@ -430,7 +423,6 @@ for (let i = 1; i <= 4; i++) {
     }
     logCube($);
 }
-logCube($);
 
 for (let i = 1; i <= 9; i++) {
     if ($.U[i] !== `w`) {
@@ -447,6 +439,8 @@ for (let i = 1; i <= 3; i++) {
         console.error(`T's aren't complete`);
     }
 }
+
+console.log(`Finish second layer`);
 
 console.log(`Done`);
 logCube($);

@@ -269,10 +269,11 @@ const findSide = () => {
 };
 
 backup();
+console.log(`Shuffle cube`);
 shuffle(); // TODO: Remove
 logCube($);
 
-// Make daisy
+console.log(`Make daisy`);
 findSide($.searchedSideColor = `y`);
 while ($.F[2] !== `w` || $.F[4] !== `w` || $.F[6] !== `w` || $.F[8] !== `w`) {
     if ($.B[2] === `w` || $.B[4] === `w` || $.B[6] === `w` || $.B[8] === `w`) {
@@ -313,7 +314,7 @@ if (!($.F[5] === `y` && $.F[2] === `w` && $.F[4] === `w` && $.F[6] === `w` && $.
     console.error(`Wrong white daisy!`);
 }
 
-// Finish white cross
+console.log(`Finish white cross`);
 for (let i = 0; i < 4; i++) { // repeat 4 times
     while (!($.F[8] === `w` && $.D[2] === $.D[5])) {
         executeCommands($.commandText = `TAHB`);
@@ -333,5 +334,5 @@ if (!($.B[5] === `y`
     console.error(`Wrong white cross!`);
 }
 
-console.log('DONE!');
+console.log('Done');
 logCube($);

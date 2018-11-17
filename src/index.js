@@ -26,7 +26,7 @@ const $ = {
     DB: createList(),
 
     commands: createList(),
-    commandText: '',
+    commandText: ``,
 
     searchedSideColor: 0,
 };
@@ -42,7 +42,7 @@ const shuffle = () => {
     for (let i = 0; i < 128; i++) {
         commands.push(commandsPool[Math.floor(Math.random() * commandsPool.length)]);
     }
-    $.commandText = commands.join(' ');
+    $.commandText = commands.join(` `);
     executeCommands();
 };
 
@@ -53,7 +53,7 @@ const parseCommands = () => {
     let insertNewItem = true;
     for (let i = 0; i < $.commandText.length; i++) { // TODO: Adapt to PC text indices
         let c = $.commandText[i];
-        if (c === ' ') {
+        if (c === ` `) {
             insertNewItem = true;
         } else {
             if (insertNewItem) {
@@ -64,26 +64,38 @@ const parseCommands = () => {
             }
         }
     }
-    $.commandText = '';
+    $.commandText = ``;
 };
 
 const executeCommands = () => {
     parseCommands();
     while ($.commands.length) {
-        if ($.commands[1] === 'TA') {
-            // console.log('TA');
+        if ($.commands[1] === `TA`) {
+            // console.log(`TA`);
             TA();
-        } else if ($.commands[1] === 'TB') {
-            // console.log('TB');
+        } else if ($.commands[1] === `TAP`) {
+            // console.log(`TAP`);
+            TAP();
+        } else if ($.commands[1] === `TB`) {
+            // console.log(`TB`);
             TB();
-        } else if ($.commands[1] === 'TAHB') {
-            // console.log('TAHB');
+        } else if ($.commands[1] === `TBP`) {
+            // console.log(`TBP`);
+            TBP();
+        } else if ($.commands[1] === `TAHB`) {
+            // console.log(`TAHB`);
             TAHB();
-        } else if ($.commands[1] === 'TBHA') {
-            // console.log('TBHA');
+        } else if ($.commands[1] === `TAPHB`) {
+            // console.log(`TAPHB`);
+            TAPHB();
+        } else if ($.commands[1] === `TBHA`) {
+            // console.log(`TBHA`);
             TBHA();
+        } else if ($.commands[1] === `TBPHA`) {
+            // console.log(`TBPHA`);
+            TBPHA();
         } else {
-            console.error('Unknown command', );
+            console.error(`Unknown command`, $.commands[1]);
         }
         delete $.commands[1];
     }
@@ -168,6 +180,13 @@ const TA = () => {
     restore();
 };
 
+// Turn cube counterclockwise on X-axis
+const TAP = () => {
+    TA();
+    TA();
+    TA();
+};
+
 // Turn cube clockwise on Y-axis
 const TB = () => {
     releaseMotorA();
@@ -194,6 +213,13 @@ const TB = () => {
     }
     restore();
 };
+
+// Turn cube counterclockwise on Y-axis
+const TBP = () => {
+    TB();
+    TB();
+    TB();
+}
 
 // Turn F clockwise
 const TAHB = () => {
@@ -229,6 +255,13 @@ const TAHB = () => {
     restore();
 };
 
+// Turn F counterclockwise
+const TAPHB = () => {
+    TAHB();
+    TAHB();
+    TAHB();
+};
+
 // Turn D clockwise
 const TBHA = () => {
     turnMotorBClockwise();
@@ -252,6 +285,13 @@ const TBHA = () => {
         }
     }
     restore();
+};
+
+// Turn D counterclockwise
+const TBPHA = () => {
+    TBHA();
+    TBHA();
+    TBHA();
 };
 
 const findSide = () => {
@@ -304,7 +344,7 @@ while ($.F[2] !== `w` || $.F[4] !== `w` || $.F[6] !== `w` || $.F[8] !== `w`) {
             executeCommands($.commandText = `TAHB`);
         }
 
-        executeCommands($.commandText = `TBHA TBHA TBHA`);
+        executeCommands($.commandText = `TBPHA`);
     }
     findSide($.searchedSideColor = `y`);
 }
@@ -334,5 +374,5 @@ if (!($.B[5] === `y`
     console.error(`Wrong white cross!`);
 }
 
-console.log('Done');
+console.log(`Done`);
 logCube($);

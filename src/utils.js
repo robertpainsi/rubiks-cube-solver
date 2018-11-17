@@ -30,14 +30,18 @@ export const logCube = ($) => {
     for (let i = 0; i < 3; i++) {
         let line = ``;
         [`F`, `B`, `L`, `R`, `U`, `D`].forEach((sideName) => {
-            line += `   ${(i === 0) ? `${sideName}` : ` `}|${sideToArray($[sideName])[i].join(' ')}|`
-                .replace(/r/g, red(`r`))
-                .replace(/g/g, green(`g`))
-                .replace(/b/g, blue(`b`))
-                .replace(/y/g, yellow(`y`))
-                .replace(/o/g, orange(`o`))
+            line += colorizeBlock(`   ${(i === 0) ? `${sideName}` : ` `}|${sideToArray($[sideName])[i].join(' ')}|`);
         });
         console.log(line);
     }
     console.log();
+};
+
+export const colorizeBlock = (b) => {
+    return b
+        .replace(/r/g, red(`r`))
+        .replace(/g/g, green(`g`))
+        .replace(/b/g, blue(`b`))
+        .replace(/y/g, yellow(`y`))
+        .replace(/o/g, orange(`o`));
 };

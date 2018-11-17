@@ -1,7 +1,8 @@
 'use strict';
 
 import {createList} from "./pocket_code";
-import {logCube} from "./utils";
+import {colorizeBlock, logCube} from "./utils";
+import colorize from "./colorize";
 
 const $ = {
     // F: createList([`y`, `r`, `g`, `r`, `w`, `o`, `o`, `o`, `w`,]),
@@ -372,6 +373,78 @@ if (!($.D[5] === `y`
         && $.R[2] === $.R[5]
     )) {
     console.error(`Wrong white cross!`);
+}
+
+const righty = () => {
+    executeCommands($.commandText = `TAHB TBHA TAPHB TBPHA`);
+};
+
+console.log('#####################################################################');
+console.log(`Finish white side`);
+const sides = createList([`b`, `o`, `o`, `g`, `g`, `r`, `r`, `b`]);
+for (let i = 1; i <= 4; i++) {
+    const c1 = sides[(i - 1) * 2 + 1];
+    const c2 = sides[(i - 1) * 2 + 2];
+
+    console.log(`Looking for colors`, colorizeBlock(c1), colorizeBlock(c2));
+    logCube($);
+
+    console.log(`Move away from white side`);
+    for (let j = 0; j < 4; j++) {
+        if (
+            ($.F[3] === `w` || $.U[9] === `w` || $.R[1] === `w`) &&
+            ($.F[3] === c1 || $.U[9] === c1 || $.R[1] === c1) &&
+            ($.F[3] === c2 || $.U[9] === c2 || $.R[1] === c2)
+        ) {
+            righty();
+        } else {
+            executeCommands($.commandText = `TB`);
+        }
+    }
+    logCube($);
+
+    console.log('Colored edge on correct side, F,U,R = F,R,`w`');
+    while ($.F[5] !== c1) {
+        executeCommands($.commandText = `TB`);
+    }
+    logCube($);
+    console.log(colorizeBlock($.F[5]));
+    while (!(
+        ($.F[9] === `w` || $.D[3] === `w` || $.R[7] === `w`) &&
+        ($.F[9] === c1 || $.D[3] === c1 || $.R[7] === c1) &&
+        ($.F[9] === c2 || $.D[3] === c2 || $.R[7] === c2)
+    )) {
+        console.log('1', colorizeBlock($.F[9]), colorizeBlock($.D[3]), colorizeBlock($.R[7]));
+        executeCommands($.commandText = `TBHA`);
+        logCube($);
+        console.log('2', colorizeBlock($.F[9]), colorizeBlock($.D[3]), colorizeBlock($.R[7]));
+        let i = 0;
+    }
+    logCube($);
+    console.log(colorizeBlock($.F[9]), colorizeBlock($.D[3]), colorizeBlock($.R[7]));
+
+    console.log('Fix white edge');
+    while ($.U[9] !== `w` || $.F[3] !== $.F[5] || $.R[1] !== $.R[5]) {
+        righty();
+    }
+    logCube($);
+}
+logCube($);
+
+for (let i = 1; i <= 9; i++) {
+    if ($.U[i] !== `w`) {
+        console.error(`U isn't completely white`);
+    }
+}
+for (let i = 1; i <= 3; i++) {
+    if (
+        $.F[i] !== $.F[5]
+        || $.B[i] !== $.B[5]
+        || $.L[i] !== $.L[5]
+        || $.R[i] !== $.R[5]
+    ) {
+        console.error(`T's aren't complete`);
+    }
 }
 
 console.log(`Done`);

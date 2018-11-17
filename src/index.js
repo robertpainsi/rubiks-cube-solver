@@ -361,15 +361,15 @@ for (let i = 0; i < 4; i++) { // repeat 4 times
     }
     executeCommands($.commandText = `TBHA TBHA TA`);
 }
-executeCommands($.commandText = `TB TB`);
+executeCommands($.commandText = `TB TA`);
 logCube($);
 
-if (!($.B[5] === `y`
-        && $.F[2] === `w` && $.F[4] === `w` && $.F[5] === `w` && $.F[6] === `w` && $.F[8] === `w`
-        && $.L[5] === $.L[6]
-        && $.R[5] === $.R[4]
-        && $.U[5] === $.U[8]
-        && $.D[5] === $.D[2]
+if (!($.D[5] === `y`
+        && $.U[2] === `w` && $.U[4] === `w` && $.U[5] === `w` && $.U[6] === `w` && $.U[8] === `w`
+        && $.F[2] === $.F[5]
+        && $.B[2] === $.B[5]
+        && $.L[2] === $.L[5]
+        && $.R[2] === $.R[5]
     )) {
     console.error(`Wrong white cross!`);
 }

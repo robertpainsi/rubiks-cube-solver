@@ -1,5 +1,9 @@
 'use strict';
 
+import colorize from "./colorize";
+
+const {red, blue, green, orange, yellow} = colorize;
+
 console.error = function (...args) {
     console.log(`\x1b[31m`, ...args, `\x1b[0m`);
 };
@@ -27,11 +31,11 @@ export const logCube = ($) => {
         let line = ``;
         [`F`, `B`, `L`, `R`, `U`, `D`].forEach((sideName) => {
             line += `   ${(i === 0) ? `${sideName}` : ` `}|${sideToArray($[sideName])[i].join(' ')}|`
-                .replace(/r/g, `\x1b[31mr\x1b[0m`)
-                .replace(/g/g, `\x1b[32mg\x1b[0m`)
-                .replace(/b/g, `\x1b[34mb\x1b[0m`)
-                .replace(/y/g, `\x1b[33my\x1b[0m`)
-                .replace(/o/g, `\x1b[36mo\x1b[0m`);
+                .replace(/r/g, red(`r`))
+                .replace(/g/g, green(`g`))
+                .replace(/b/g, blue(`b`))
+                .replace(/y/g, yellow(`y`))
+                .replace(/o/g, orange(`o`))
         });
         console.log(line);
     }

@@ -295,6 +295,7 @@ const TBPHA = () => {
     TBHA();
 };
 
+// TODO: Find better name for variable and method
 const findSide = () => {
     for (let i = 0; i < 2; i++) { // repeat 2 times
         for (let j = 0; j < 4; j++) { // repeat 4 times

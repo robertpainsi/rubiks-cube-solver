@@ -1,16 +1,10 @@
 'use strict';
 
 import {createList} from "./pocket_code";
-import {colorizeBlock, logCube} from "./utils";
+import {colorizeBlock, logCube, shuffle} from "./utils";
+import assert from "./assert";
 
 const $ = {
-    // F: createList([`y`, `r`, `g`, `r`, `w`, `o`, `o`, `o`, `w`,]),
-    // B: createList([`y`, `r`, `y`, `b`, `y`, `b`, `b`, `b`, `o`,]),
-    // L: createList([`r`, `w`, `r`, `y`, `b`, `y`, `w`, `r`, `y`,]),
-    // R: createList([`r`, `y`, `b`, `w`, `g`, `o`, `o`, `g`, `w`,]),
-    // U: createList([`g`, `b`, `o`, `g`, `r`, `g`, `b`, `g`, `w`,]),
-    // D: createList([`g`, `y`, `b`, `w`, `o`, `o`, `g`, `w`, `r`,]),
-
     F: createList([`w`, `w`, `w`, `w`, `w`, `w`, `w`, `w`, `w`,]),
     B: createList([`y`, `y`, `y`, `y`, `y`, `y`, `y`, `y`, `y`,]),
     L: createList([`b`, `b`, `b`, `b`, `b`, `b`, `b`, `b`, `b`,]),
@@ -34,16 +28,6 @@ const $ = {
 const direction = {
     cw: 0,
     ccw: 1,
-};
-
-const shuffle = () => {
-    const commandsPool = [`TA`, `TB`, `TAHB`, `TBHA`];
-    const commands = [];
-    for (let i = 0; i < 128; i++) {
-        commands.push(commandsPool[Math.floor(Math.random() * commandsPool.length)]);
-    }
-    $.commandText = commands.join(` `);
-    executeCommands();
 };
 
 const parseCommands = () => {
@@ -162,7 +146,7 @@ const TA = () => {
     turnMotorACounterclockwise();
     holdMotorA();
 
-    // TODO: simultaneously
+    // TODO: optional - simultaneously
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
@@ -196,7 +180,7 @@ const TB = () => {
     turnMotorBCounterclockwise();
     holdMotorB();
 
-    // TODO: simultaneously
+    // TODO: optional - simultaneously
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
@@ -219,7 +203,7 @@ const TBP = () => {
     TB();
     TB();
     TB();
-}
+};
 
 // Turn F clockwise
 const TAHB = () => {
@@ -228,7 +212,7 @@ const TAHB = () => {
     turnMotorACounterclockwise();
     holdMotorA();
 
-    // TODO: simultaneously
+    // TODO: optional - simultaneously
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
@@ -269,7 +253,7 @@ const TBHA = () => {
     turnMotorBCounterclockwise();
     holdMotorB();
 
-    // TODO: simultaneously
+    // TODO: optional - simultaneously
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
@@ -319,7 +303,7 @@ const lefty = () => {
 
 backup();
 console.log(`Shuffle cube`);
-shuffle(); // TODO: Remove
+shuffle($, executeCommands); // TODO: Remove
 logCube($);
 
 console.log(`Make daisy`);
@@ -359,9 +343,7 @@ while ($.F[2] !== `w` || $.F[4] !== `w` || $.F[6] !== `w` || $.F[8] !== `w`) {
 }
 logCube($);
 
-if (!($.F[5] === `y` && $.F[2] === `w` && $.F[4] === `w` && $.F[6] === `w` && $.F[8] === `w`)) {
-    console.error(`Wrong white daisy!`);
-}
+assert.whiteDaisy($);
 
 console.log(`Finish white cross`);
 for (let i = 0; i < 4; i++) { // repeat 4 times
@@ -373,15 +355,7 @@ for (let i = 0; i < 4; i++) { // repeat 4 times
 executeCommands($.commandText = `TB TA`);
 logCube($);
 
-if (!($.D[5] === `y`
-        && $.U[2] === `w` && $.U[4] === `w` && $.U[5] === `w` && $.U[6] === `w` && $.U[8] === `w`
-        && $.F[2] === $.F[5]
-        && $.B[2] === $.B[5]
-        && $.L[2] === $.L[5]
-        && $.R[2] === $.R[5]
-    )) {
-    console.error(`Wrong white cross!`);
-}
+assert.whiteCross($);
 
 console.log(`Finish white side`);
 const sides = createList([`b`, `o`, `o`, `g`, `g`, `r`, `r`, `b`]);
@@ -428,18 +402,7 @@ for (let i = 1; i <= 4; i++) {
     logCube($);
 }
 
-for (let i = 1; i <= 9; i++) {
-    if ($.U[i] !== `w`) {
-        console.error(`U isn't completely white`);
-    }
-}
-[$.F, $.B, $.L, $.R].forEach((side) => {
-    for (let i = 1; i <= 3; i++) {
-        if (side[i] !== side[5]) {
-            console.error(`T's aren't complete`);
-        }
-    }
-});
+assert.ts($);
 
 console.log(`Finish second layer`);
 for (let i = 1; i <= 4; i++) {
@@ -491,19 +454,7 @@ for (let i = 1; i <= 4; i++) {
 }
 logCube($);
 
-for (let i = 1; i <= 9; i++) {
-    if ($.U[i] !== `w`) {
-        console.error(`U isn't completely white`);
-    }
-}
-[$.F, $.B, $.L, $.R].forEach((side) => {
-    for (let i = 1; i <= 6; i++) {
-        if (side[i] !== side[5]) {
-            console.error(`1 and 2 layers aren't complete`);
-        }
-    }
-});
-
+assert.firstAndSecondLayer($);
 
 console.log(`Done`);
 logCube($);

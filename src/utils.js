@@ -45,3 +45,13 @@ export const colorizeBlock = (b) => {
         .replace(/y/g, yellow(`y`))
         .replace(/o/g, orange(`o`));
 };
+
+export const shuffle = ($, executeCommands) => {
+    const commandsPool = [`TA`, `TB`, `TAHB`, `TBHA`];
+    const commands = [];
+    for (let i = 0; i < 128; i++) {
+        commands.push(commandsPool[Math.floor(Math.random() * commandsPool.length)]);
+    }
+    $.commandText = commands.join(` `);
+    executeCommands();
+};

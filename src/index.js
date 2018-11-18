@@ -309,6 +309,14 @@ const findSide = () => {
     }
 };
 
+const righty = () => {
+    executeCommands($.commandText = `TAHB TBHA TAPHB TBPHA`);
+};
+
+const lefty = () => {
+    executeCommands($.commandText = `TAPHB TBHA TAHB TBPHA`);
+};
+
 backup();
 console.log(`Shuffle cube`);
 shuffle(); // TODO: Remove
@@ -375,10 +383,6 @@ if (!($.D[5] === `y`
     console.error(`Wrong white cross!`);
 }
 
-const righty = () => {
-    executeCommands($.commandText = `TAHB TBHA TAPHB TBPHA`);
-};
-
 console.log(`Finish white side`);
 const sides = createList([`b`, `o`, `o`, `g`, `g`, `r`, `r`, `b`]);
 for (let i = 1; i <= 4; i++) {
@@ -438,6 +442,68 @@ for (let i = 1; i <= 9; i++) {
 });
 
 console.log(`Finish second layer`);
+for (let i = 1; i <= 4; i++) {
+    const c1 = sides[(i - 1) * 2 + 1];
+    const c2 = sides[(i - 1) * 2 + 2];
+
+    console.log(`Finish second layer colors`, colorizeBlock(c1), colorizeBlock(c2));
+    logCube($);
+
+    for (let i = 0; i < 4; i++) {
+        if (($.F[6] === c1 || $.F[6] === c2) && ($.R[4] === c1 || $.R[4] === c2)) {
+            righty();
+            righty();
+            executeCommands($.commandText = `TBPHA`);
+            righty();
+            righty();
+            righty();
+            righty();
+        } else {
+            executeCommands($.commandText = `TB`);
+        }
+    }
+
+    while (!(($.F[8] === c1 || $.F[8] === c2) && ($.D[2] === c1 || $.D[2] === c2))) {
+        executeCommands($.commandText = `TBHA`);
+    }
+    while (!($.F[5] === $.F[8] && ($.F[5] === c1 || $.F[5] === c2))) {
+        executeCommands($.commandText = `TBHA TBP`);
+    }
+    if ($.L[5] === c1 || $.L[5] === c2) {
+        executeCommands($.commandText = `TBHA TBHA`);
+        lefty();
+        lefty();
+        executeCommands($.commandText = `TBHA`);
+        lefty();
+        lefty();
+        lefty();
+        lefty();
+    } else if ($.R[5] === c1 || $.R[5] === c2) {
+        executeCommands($.commandText = `TBHA TBHA`);
+        righty();
+        righty();
+        executeCommands($.commandText = `TBHA`);
+        righty();
+        righty();
+        righty();
+        righty();
+    }
+}
+logCube($);
+
+for (let i = 1; i <= 9; i++) {
+    if ($.U[i] !== `w`) {
+        console.error(`U isn't completely white`);
+    }
+}
+[$.F, $.B, $.L, $.R].forEach((side) => {
+    for (let i = 1; i <= 6; i++) {
+        if (side[i] !== side[5]) {
+            console.error(`1 and 2 layers aren't complete`);
+        }
+    }
+});
+
 
 console.log(`Done`);
 logCube($);

@@ -56,4 +56,15 @@ export default {
             }
         });
     },
+    cube: function ($) {
+        [$.F, $.B, $.L, $.R, $.U, $.D].forEach((side) => {
+            for (let i = 1; i <= 9; i++) {
+                if (side[i] !== side[5]) {
+                    console.error(`Cube isn't complete`);
+                    logCube($);
+                    process.exit();
+                }
+            }
+        });
+    },
 }

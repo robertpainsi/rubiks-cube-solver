@@ -2,6 +2,10 @@
 
 import {logCube} from "./utils";
 
+console.error = function (...args) {
+    console.log(`\x1b[31m${[...args].join(` `)}\x1b[0m`);
+};
+
 export default {
     whiteDaisy: function ($) {
         if (!($.F[5] === `y` && $.F[2] === `w` && $.F[4] === `w` && $.F[6] === `w` && $.F[8] === `w`)) {

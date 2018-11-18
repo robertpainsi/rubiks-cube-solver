@@ -5,8 +5,8 @@ import {logCube} from "./utils";
 export default {
     whiteDaisy: function ($) {
         if (!($.F[5] === `y` && $.F[2] === `w` && $.F[4] === `w` && $.F[6] === `w` && $.F[8] === `w`)) {
-            logCube($);
             console.error(`Wrong white daisy!`);
+            logCube($);
             process.exit();
         }
     },
@@ -18,16 +18,16 @@ export default {
                 && $.L[2] === $.L[5]
                 && $.R[2] === $.R[5]
             )) {
-            logCube($);
             console.error(`Wrong white cross!`);
+            logCube($);
             process.exit();
         }
     },
     whiteSide: function ($) {
         for (let i = 1; i <= 9; i++) {
             if ($.U[i] !== `w`) {
-                logCube($);
                 console.error(`U isn't completely white`);
+                logCube($);
                 process.exit();
             }
         }
@@ -37,8 +37,8 @@ export default {
         [$.F, $.B, $.L, $.R].forEach((side) => {
             for (let i = 1; i <= 3; i++) {
                 if (side[i] !== side[5]) {
-                    logCube($);
                     console.error(`T's aren't complete`);
+                    logCube($);
                     process.exit();
                 }
             }
@@ -49,11 +49,11 @@ export default {
         [$.F, $.B, $.L, $.R].forEach((side) => {
             for (let i = 1; i <= 6; i++) {
                 if (side[i] !== side[5]) {
-                    logCube($);
                     console.error(`1 and 2 layers aren't complete`);
+                    logCube($);
                     process.exit();
                 }
             }
         });
-    }
+    },
 }

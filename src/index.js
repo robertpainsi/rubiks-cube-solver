@@ -2,7 +2,6 @@
 
 import {createList} from "./pocket_code";
 import {colorizeBlock, logCube} from "./utils";
-import colorize from "./colorize";
 
 const $ = {
     // F: createList([`y`, `r`, `g`, `r`, `w`, `o`, `o`, `o`, `w`,]),

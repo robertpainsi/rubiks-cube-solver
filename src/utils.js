@@ -29,8 +29,8 @@ export const logCube = ($) => {
 
     for (let i = 0; i < 3; i++) {
         let line = ``;
-        [`F`, `B`, `L`, `R`, `U`, `D`].forEach((sideName) => {
-            line += colorizeBlock(`   ${(i === 0) ? `${sideName}` : ` `}|${sideToArray($[sideName])[i].join(' ')}|`);
+        [`F`, `R`, `B`, `L`, `D`, `U`].forEach((sideName) => {
+            line += colorizeBlock(` ${(i === 0) ? `${sideName}` : ` `}|${sideToArray($[sideName])[i].join(' ')}|`);
         });
         console.log(line);
     }

@@ -396,6 +396,7 @@ for (let i = 1; i <= 4; i++) {
             ($.F[3] === c2 || $.U[9] === c2 || $.R[1] === c2)
         ) {
             righty();
+            // break; // Performance improvement
         } else {
             executeCommands($.commandText = `TB`);
         }
@@ -428,16 +429,13 @@ for (let i = 1; i <= 9; i++) {
         console.error(`U isn't completely white`);
     }
 }
-for (let i = 1; i <= 3; i++) {
-    if (
-        $.F[i] !== $.F[5]
-        || $.B[i] !== $.B[5]
-        || $.L[i] !== $.L[5]
-        || $.R[i] !== $.R[5]
-    ) {
-        console.error(`T's aren't complete`);
+[$.F, $.B, $.L, $.R].forEach((side) => {
+    for (let i = 1; i <= 3; i++) {
+        if (side[i] !== side[5]) {
+            console.error(`T's aren't complete`);
+        }
     }
-}
+});
 
 console.log(`Finish second layer`);
 

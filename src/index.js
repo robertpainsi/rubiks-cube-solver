@@ -80,6 +80,7 @@ const executeCommands = () => {
             TBPHA();
         } else {
             console.error(`Unknown command`, $.commands[1]);
+            process.exit();
         }
         delete $.commands[1];
     }

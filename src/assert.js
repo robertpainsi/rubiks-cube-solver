@@ -60,6 +60,14 @@ export default {
             }
         });
     },
+    yellowCross: function ($) {
+        this.firstAndSecondLayer($);
+        if (!($.D[5] === `y` && $.D[2] === `y` && $.D[4] === `y` && $.D[6] === `y` && $.D[8] === `y`)) {
+            console.error(`Wrong yellow cross!`);
+            logCube($);
+            process.exit();
+        }
+    },
     cube: function ($) {
         [$.F, $.B, $.L, $.R, $.U, $.D].forEach((side) => {
             for (let i = 1; i <= 9; i++) {

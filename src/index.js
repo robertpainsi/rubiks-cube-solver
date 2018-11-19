@@ -456,5 +456,33 @@ logCube($);
 
 assert.firstAndSecondLayer($);
 
+console.log(`Finish top yellow cross`);
+while (
+    $.D[2] !== `y`
+    || $.D[4] !== `y`
+    || $.D[6] !== `y`
+    || $.D[8] !== `y`
+    ) {
+
+    while (($.D[2] === `y` && $.D[8] === `y`)
+    || ($.D[2] === `y` && $.D[4] === `y`)
+    || ($.D[2] === `y` && $.D[6] === `y`)
+    || ($.D[4] === `y` && $.D[8] === `y`)) {
+        executeCommands($.commandText = `TB`);
+    }
+
+    executeCommands($.commandText = `TAHB TB`);
+    righty();
+    executeCommands($.commandText = `TBP TAPHB`);
+
+    assert.firstAndSecondLayer($);
+}
+
+assert.yellowCross($);
+
+console.log(`Finish top side`);
+
+assert.cube($);
+
 console.log(`Done`);
 logCube($);

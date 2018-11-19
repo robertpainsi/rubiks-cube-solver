@@ -400,6 +400,8 @@ for (let i = 1; i <= 4; i++) {
         righty();
     }
     logCube($);
+
+    assert.whiteCross($);
 }
 
 assert.ts($);
@@ -451,6 +453,8 @@ for (let i = 1; i <= 4; i++) {
         righty();
         righty();
     }
+
+    assert.ts($);
 }
 logCube($);
 

@@ -68,6 +68,14 @@ export default {
             process.exit();
         }
     },
+    yellowCrossEdges: function ($) {
+        this.yellowCross($);
+        if (!($.F[5] === $.F[8] && $.R[5] === $.R[8] && $.B[5] === $.B[8] && $.L[5] === $.L[8])) {
+            console.error(`Wrong yellow cross!`);
+            logCube($);
+            process.exit();
+        }
+    },
     cube: function ($) {
         [$.F, $.B, $.L, $.R, $.U, $.D].forEach((side) => {
             for (let i = 1; i <= 9; i++) {

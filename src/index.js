@@ -363,7 +363,7 @@ for (let i = 1; i <= 4; i++) {
     const c1 = sides[(i - 1) * 2 + 1];
     const c2 = sides[(i - 1) * 2 + 2];
 
-    console.log(`Finish edge w`, colorizeBlock(c1), colorizeBlock(c2));
+    console.log(`Finish white corners`, colorizeBlock(c1), colorizeBlock(c2));
     logCube($);
 
     console.log(`Move away from white side`);
@@ -381,7 +381,7 @@ for (let i = 1; i <= 4; i++) {
     }
     logCube($);
 
-    console.log('Colored edge on correct side, F,U,R = F,R,`w`');
+    console.log('Colored corner on correct side, F,U,R = F,R,`w`');
     while ($.F[5] !== c1) {
         executeCommands($.commandText = `TB`);
     }
@@ -395,7 +395,7 @@ for (let i = 1; i <= 4; i++) {
     }
     logCube($);
 
-    console.log('Fix white edge');
+    console.log('Fix white corner');
     while ($.U[9] !== `w` || $.F[3] !== $.F[5] || $.R[1] !== $.R[5]) {
         righty();
     }
@@ -481,8 +481,30 @@ while (
 
     assert.firstAndSecondLayer($);
 }
+logCube($);
 
 assert.yellowCross($);
+
+console.log(`Finish yellow edges`);
+while (!(
+    ($.F[5] === $.F[8])
+    && ($.B[5] === $.B[8])
+    && ($.L[5] === $.L[8])
+    && ($.R[5] === $.R[8])
+)) {
+    if ($.R[5] !== $.R[8]) {
+        console.log(`Swap edges`);
+        executeCommands($.commandText = `TAHB TBHA TAPHB TBHA TAHB TBHA TBHA TAPHB TBHA`);
+        logCube($);
+    }
+    console.log(`Rotate cube`);
+    executeCommands($.commandText = `TB`);
+    logCube($);
+
+    assert.yellowCross($);
+}
+
+assert.yellowCrossEdges($);
 
 console.log(`Finish top side`);
 

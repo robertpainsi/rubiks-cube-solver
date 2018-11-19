@@ -406,7 +406,7 @@ for (let i = 1; i <= 4; i++) {
 
 assert.ts($);
 
-console.log(`Finish second layer`);
+console.log(`Finish second layer`); // TODO: Add comments and cube logs
 for (let i = 1; i <= 4; i++) {
     const c1 = sides[(i - 1) * 2 + 1];
     const c2 = sides[(i - 1) * 2 + 2];

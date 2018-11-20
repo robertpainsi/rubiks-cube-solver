@@ -567,6 +567,7 @@ executeCommands($.commandText = `TA TA`);
 while ($.F[5] !== $.F[8]) {
     executeCommands($.commandText = `TBHA`);
 }
+console.log(`Done`);
 logCube($);
 
 assert.cube($);

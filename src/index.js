@@ -537,5 +537,36 @@ logCube($);
 
 assert.yellowCrossEdgesAndCorners($);
 
+console.log(`Orient yellow corners`);
+executeCommands($.commandText = `TA TA`);
+while (!($.U[1] === `y` && $.U[3] === `y` && $.U[7] === `y` && $.U[9] === `y`)) {
+    console.log(`Orient yellow corner`);
+    logCube($);
+    for (let k = 1; k <= 4; k++) { // repeat 4 times
+        if ($.U[9] !== 'y') {
+            // R' D' R D
+            executeCommands($.commandText = `TBP TAPHB TB`);
+            executeCommands($.commandText = `TBPHA`);
+            executeCommands($.commandText = `TBP TAHB TB`);
+            executeCommands($.commandText = `TBHA`);
+        }
+    }
+    logCube($);
+
+    console.log(`Rotate to next yellow corner not facing correctly`);
+    executeCommands($.commandText = `TA TA`);
+    for (let k = 1; k <= 4; k++) { // repeat 4 times
+        if ($.D[1] === 'y') {
+            executeCommands($.commandText = `TBPHA`);
+        }
+    }
+    executeCommands($.commandText = `TA TA`);
+    logCube($);
+}
+executeCommands($.commandText = `TA TA`);
+while ($.F[5] !== $.F[8]) {
+    executeCommands($.commandText = `TBHA`);
+}
 logCube($);
+
 assert.cube($);

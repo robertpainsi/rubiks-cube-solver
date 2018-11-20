@@ -54,29 +54,22 @@ const parseCommands = () => {
 const executeCommands = () => {
     parseCommands();
     while ($.commands.length) {
+        // console.log($.commands[1]);
         if ($.commands[1] === `TA`) {
-            // console.log(`TA`);
             TA();
         } else if ($.commands[1] === `TAP`) {
-            // console.log(`TAP`);
             TAP();
         } else if ($.commands[1] === `TB`) {
-            // console.log(`TB`);
             TB();
         } else if ($.commands[1] === `TBP`) {
-            // console.log(`TBP`);
             TBP();
         } else if ($.commands[1] === `TAHB`) {
-            // console.log(`TAHB`);
             TAHB();
         } else if ($.commands[1] === `TAPHB`) {
-            // console.log(`TAPHB`);
             TAPHB();
         } else if ($.commands[1] === `TBHA`) {
-            // console.log(`TBHA`);
             TBHA();
         } else if ($.commands[1] === `TBPHA`) {
-            // console.log(`TBPHA`);
             TBPHA();
         } else {
             console.error(`Unknown command`, $.commands[1]);

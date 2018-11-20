@@ -518,10 +518,8 @@ for (let i = 1; i <= 3; i++) { // repeat 3 times TODO: Maybe 2 times is enough?
             );
 
             executeCommands($.commandText = `TBP`);
-            /*
-             * `U R U' L' U R' U' L`
-             * BRD-corner stays they same, other three D corners rotate
-             */
+            //  U R U' L' U R' U' L
+            //  BRD-corner stays they same, other three D corners rotate
             executeCommands($.commandText = `TBHA TAHB TBPHA TB TB TAPHB TB TB TBHA TAPHB TBPHA TB TB TAHB TB TB`);
             executeCommands($.commandText = `TB`);
             logCube($);

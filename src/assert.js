@@ -80,11 +80,15 @@ export default {
         this.yellowCross($);
         if ([
                 {A: $.F, B: $.R, C: 3},
+                {A: $.R, B: $.B, C: 9},
+                {A: $.B, B: $.L, C: 7},
+                {A: $.L, B: $.F, C: 1},
             ].some((corner) => {
-                return (!(
-                    corner.A[5] === corner.A[9] || corner.A[5] === corner.B[7] || corner.A[5] === $.D[corner.C])
+                return !(
+                    (corner.A[5] === corner.A[9] || corner.A[5] === corner.B[7] || corner.A[5] === $.D[corner.C])
                     && (corner.B[5] === corner.A[9] || corner.B[5] === corner.B[7] || corner.B[5] === $.D[corner.C])
-                    && (`y` === corner.A[9] || `y` === corner.B[7] || `y` === $.D[corner.C]));
+                    && (`y` === corner.A[9] || `y` === corner.B[7] || `y` === $.D[corner.C])
+                );
             })) {
             console.error(`Wrong yellow corners position!`);
             logCube($);

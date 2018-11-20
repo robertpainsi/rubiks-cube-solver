@@ -502,8 +502,8 @@ logCube($);
 assert.yellowCrossEdges($);
 
 console.log(`Move corners to their places`);
-for (let i = 1; i <= 3; i++) { // repeat 3 times TODO: Maybe 2 times is enough?
-    for (let k = 1; k <= 2; k++) { // repeat 2 times
+for (let i = 1; i <= 4; i++) { // repeat 4 times
+    for (let k = 1; k <= 3; k++) { // repeat 3 times
         if (!(
                 ($.F[5] === $.F[9] || $.F[5] === $.R[7] || $.F[5] === $.D[3])
                 && ($.R[5] === $.F[9] || $.R[5] === $.R[7] || $.R[5] === $.D[3])
@@ -535,6 +535,11 @@ for (let i = 1; i <= 3; i++) { // repeat 3 times TODO: Maybe 2 times is enough?
 }
 logCube($);
 
+console.log(`Corners: FRD(${colorizeBlock($.F[9])}${colorizeBlock($.R[7])}${colorizeBlock($.D[3])})`
+    + ` BRD(${colorizeBlock($.B[7])}${colorizeBlock($.R[9])}${colorizeBlock($.D[9])})`
+    + ` BLD(${colorizeBlock($.B[9])}${colorizeBlock($.L[7])}${colorizeBlock($.D[7])})`
+    + ` FLD(${colorizeBlock($.F[7])}${colorizeBlock($.L[9])}${colorizeBlock($.D[1])})`
+);
 assert.yellowCrossEdgesAndCorners($);
 
 console.log(`Orient yellow corners`);

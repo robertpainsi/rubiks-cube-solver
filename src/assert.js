@@ -30,7 +30,7 @@ export default {
     whiteSide: function ($) {
         for (let i = 1; i <= 9; i++) {
             if ($.U[i] !== `w`) {
-                console.error(`U isn't completely white`);
+                console.error(`U isn't completely white!`);
                 logCube($);
                 process.exit();
             }
@@ -41,7 +41,7 @@ export default {
         [$.F, $.B, $.L, $.R].forEach((side) => {
             for (let i = 1; i <= 3; i++) {
                 if (side[i] !== side[5]) {
-                    console.error(`T's aren't complete`);
+                    console.error(`T's aren't complete!`);
                     logCube($);
                     process.exit();
                 }
@@ -53,7 +53,7 @@ export default {
         [$.F, $.B, $.L, $.R].forEach((side) => {
             for (let i = 1; i <= 6; i++) {
                 if (side[i] !== side[5]) {
-                    console.error(`1 and 2 layers aren't complete`);
+                    console.error(`1 and 2 layers aren't complete!`);
                     logCube($);
                     process.exit();
                 }
@@ -80,7 +80,7 @@ export default {
         [$.F, $.B, $.L, $.R, $.U, $.D].forEach((side) => {
             for (let i = 1; i <= 9; i++) {
                 if (side[i] !== side[5]) {
-                    console.error(`Cube isn't complete`);
+                    console.error(`Cube isn't complete!`);
                     logCube($);
                     process.exit();
                 }

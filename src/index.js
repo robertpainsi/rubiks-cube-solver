@@ -30,7 +30,7 @@ const parseCommands = () => {
         delete $.commands[1];
     }
     let insertNewItem = true;
-    for (let i = 0; i < $.commandText.length; i++) { // TODO: Adapt to PC text indices
+    for (let i = 0; i < $.commandText.length; i++) { // TODO: Adapt to Catrobat text indices [1...length]
         let c = $.commandText[i];
         if (c === ` `) {
             insertNewItem = true;

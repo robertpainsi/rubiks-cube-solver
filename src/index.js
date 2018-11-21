@@ -23,7 +23,7 @@ const $ = {
     DB: createList(),
 
     commands: createList(),
-    commandText: ``,
+    commandText: 0,
 
     moveFaceToFColor: 0,
 

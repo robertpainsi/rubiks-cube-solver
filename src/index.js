@@ -25,11 +25,6 @@ const $ = {
     searchedSideColor: 0,
 };
 
-const direction = {
-    cw: 0,
-    ccw: 1,
-};
-
 const parseCommands = () => {
     while ($.commands.length) {
         delete $.commands[1];

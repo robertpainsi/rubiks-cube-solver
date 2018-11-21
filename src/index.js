@@ -25,7 +25,7 @@ const $ = {
     commands: createList(),
     commandText: ``,
 
-    moveSideToFColor: 0,
+    moveFaceToFColor: 0,
 };
 
 /** Command handler */
@@ -220,10 +220,10 @@ const TBPHA = () => {
 };
 
 /** Command utils */
-const moveSideToF = () => {
+const moveFaceToF = () => {
     for (let i = 0; i < 2; i++) { // repeat 2 times
         for (let j = 0; j < 4; j++) { // repeat 4 times
-            if ($.F[5] === $.moveSideToFColor) {
+            if ($.F[5] === $.moveFaceToFColor) {
                 return;
             }
             executeCommands($.commandText = `TB`);
@@ -310,7 +310,7 @@ const main = () => {
 
     makeDaisy();
     finishWhiteCross();
-    finishWhiteSide();
+    finishWhiteFace();
     finishSecondLayer();
     finishYellowCross();
     finishYellowEdges();
@@ -323,7 +323,7 @@ const main = () => {
 /** Step: Make daisy */
 const makeDaisy = () => {
     console.log(`Make daisy`);
-    moveSideToF($.moveSideToFColor = `y`);
+    moveFaceToF($.moveFaceToFColor = `y`);
     while ($.F[2] !== `w` || $.F[4] !== `w` || $.F[6] !== `w` || $.F[8] !== `w`) {
         if ($.B[2] === `w` || $.B[4] === `w` || $.B[6] === `w` || $.B[8] === `w`) {
             // console.log(`Move white tile from back to yellow front`);
@@ -337,7 +337,7 @@ const makeDaisy = () => {
             }
             executeCommands($.commandText = `TBHA TBHA`);
         } else {
-            // console.log(`Move white tile from side to yellow front`);
+            // console.log(`Move white tile from side to yellow front face`);
             while ($.D[2] !== `w` && $.D[4] !== `w` && $.D[6] !== `w` && $.D[8] !== `w`) {
                 executeCommands($.commandText = `TA`);
             }
@@ -355,7 +355,7 @@ const makeDaisy = () => {
 
             executeCommands($.commandText = `TBPHA`);
         }
-        moveSideToF($.moveSideToFColor = `y`);
+        moveFaceToF($.moveFaceToFColor = `y`);
     }
     logCube($);
 
@@ -377,9 +377,9 @@ const finishWhiteCross = () => {
     assert.whiteCross($);
 };
 
-/** Step: Finish white side */
-const finishWhiteSide = () => {
-    console.log(`Finish white side`);
+/** Step: Finish white face */
+const finishWhiteFace = () => {
+    console.log(`Finish white face`);
     for (let i = 1; i <= 4; i++) {
         const c1 = $.horizontalEdges[(i - 1) * 2 + 1];
         const c2 = $.horizontalEdges[(i - 1) * 2 + 2];
@@ -387,7 +387,7 @@ const finishWhiteSide = () => {
         console.log(`Finish white corners`, colorizeBlock(c1), colorizeBlock(c2));
         logCube($);
 
-        console.log(`Move away from white side`);
+        console.log(`Move away from white face`);
         for (let j = 0; j < 4; j++) { // repeat 4 times
             if (
                 ($.F[3] === `w` || $.U[9] === `w` || $.R[1] === `w`) &&
@@ -401,7 +401,7 @@ const finishWhiteSide = () => {
         }
         logCube($);
 
-        console.log('Colored corner on correct side, F,U,R = F,R,`w`');
+        console.log('Colored corner on correct faces, F,U,R = F,R,`w`');
         while ($.F[5] !== c1) {
             executeCommands($.commandText = `TB`);
         }

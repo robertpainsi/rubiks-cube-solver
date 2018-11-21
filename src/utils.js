@@ -4,25 +4,16 @@ import colorize from "./colorize";
 
 const {red, blue, green, orange, yellow} = colorize;
 
-export const logCube = ($) => {
-    const sideToArray = (side) => {
-        const result = [];
-        result.push(side.slice(1, 4));
-        result.push(side.slice(4, 7));
-        result.push(side.slice(7, 10));
-        result[2][2] = side[9];
-        return result;
-    };
-    // const cube = {
-    //     F: sideToArray($.F),
-    //     B: sideToArray($.B),
-    //     L: sideToArray($.L),
-    //     R: sideToArray($.R),
-    //     U: sideToArray($.U),
-    //     D: sideToArray($.D),
-    // };
-    // console.log(cube);
+const sideToArray = (side) => {
+    const result = [];
+    result.push(side.slice(1, 4));
+    result.push(side.slice(4, 7));
+    result.push(side.slice(7, 10));
+    result[2][2] = side[9]; // slice doesn't work for list (proxied array) with the last element.
+    return result;
+};
 
+export const logCube = ($) => {
     for (let i = 0; i < 3; i++) {
         let line = ``;
         [`F`, `R`, `B`, `L`, `D`, `U`].forEach((sideName) => {

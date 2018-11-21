@@ -50,3 +50,9 @@ export const repeat = (times, callback) => {
 
 export const setArduinoDigintalPin = (pin, value) => {
 };
+
+export const parallel = (...functions) => {
+    functions.forEach((f) => {
+        f()
+    });
+};

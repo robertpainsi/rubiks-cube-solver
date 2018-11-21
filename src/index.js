@@ -1,6 +1,6 @@
 'use strict';
 
-import {createList, repeat, setArduinoDigintalPin} from "./pocket_code";
+import {createList, parallel, repeat, setArduinoDigintalPin} from "./pocket_code";
 import {colorizeBlock, logCube, shuffle} from "./utils";
 import assert from "./assert";
 
@@ -85,14 +85,17 @@ const executeCommands = () => {
 
 // Turn cube clockwise on X-axis
 const TA = () => {
+    parallel(TA_Motor, TA_Data);
+};
+const TA_Motor = () => {
     releaseMotorB();
     turnMotorAClockwise();
     holdMotorB();
     releaseMotorA();
     turnMotorACounterclockwise();
     holdMotorA();
-
-    // TODO: optional - simultaneously
+};
+const TA_Data = () => {
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
@@ -112,21 +115,35 @@ const TA = () => {
 
 // Turn cube counterclockwise on X-axis
 const TAP = () => {
-    TA();
-    TA();
-    TA();
+    parallel(TAP_Motor, TAP_Data);
+};
+const TAP_Motor = () => {
+    releaseMotorB();
+    turnMotorACounterclockwise();
+    holdMotorB();
+    releaseMotorA();
+    turnMotorAClockwise();
+    holdMotorA();
+};
+const TAP_Data = () => {
+    TA_Data();
+    TA_Data();
+    TA_Data();
 };
 
 // Turn cube clockwise on Y-axis
 const TB = () => {
+    parallel(TB_Motor, TB_Data);
+};
+const TB_Motor = () => {
     releaseMotorA();
     turnMotorBClockwise();
     holdMotorA();
     releaseMotorB();
     turnMotorBCounterclockwise();
     holdMotorB();
-
-    // TODO: optional - simultaneously
+};
+const TB_Data = () => {
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
@@ -146,19 +163,33 @@ const TB = () => {
 
 // Turn cube counterclockwise on Y-axis
 const TBP = () => {
-    TB();
-    TB();
-    TB();
+    parallel(TBP_Motor, TBP_Data);
+};
+const TBP_Motor = () => {
+    releaseMotorA();
+    turnMotorBCounterclockwise();
+    holdMotorA();
+    releaseMotorB();
+    turnMotorBClockwise();
+    holdMotorB();
+};
+const TBP_Data = () => {
+    TB_Data();
+    TB_Data();
+    TB_Data();
 };
 
 // Turn F clockwise
 const TAHB = () => {
+    parallel(TAHB_Motor, TAHB_Data);
+};
+const TAHB_Motor = () => {
     turnMotorAClockwise();
     releaseMotorA();
     turnMotorACounterclockwise();
     holdMotorA();
-
-    // TODO: optional - simultaneously
+};
+const TAHB_Data = () => {
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
@@ -187,19 +218,31 @@ const TAHB = () => {
 
 // Turn F counterclockwise
 const TAPHB = () => {
-    TAHB();
-    TAHB();
-    TAHB();
+    parallel(TAPHB_Motor, TAPHB_Data);
+};
+const TAPHB_Motor = () => {
+    turnMotorACounterclockwise();
+    releaseMotorA();
+    turnMotorAClockwise();
+    holdMotorA();
+};
+const TAPHB_Data = () => {
+    TAHB_Data();
+    TAHB_Data();
+    TAHB_Data();
 };
 
 // Turn D clockwise
 const TBHA = () => {
+    parallel(TBHA_Motor, TBHA_Data);
+};
+const TBHA_Motor = () => {
     turnMotorBClockwise();
     releaseMotorB();
     turnMotorBCounterclockwise();
     holdMotorB();
-
-    // TODO: optional - simultaneously
+};
+const TBHA_Data = () => {
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
@@ -219,9 +262,18 @@ const TBHA = () => {
 
 // Turn D counterclockwise
 const TBPHA = () => {
-    TBHA();
-    TBHA();
-    TBHA();
+    parallel(TBPHA_Motor, TBPHA_Data);
+};
+const TBPHA_Motor = () => {
+    turnMotorBCounterclockwise();
+    releaseMotorB();
+    turnMotorBClockwise();
+    holdMotorB();
+};
+const TBPHA_Data = () => {
+    TBHA_Data();
+    TBHA_Data();
+    TBHA_Data();
 };
 
 /** Command utils */

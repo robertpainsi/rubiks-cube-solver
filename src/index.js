@@ -22,7 +22,7 @@ const $ = {
     commands: createList(),
     commandText: ``,
 
-    searchedSideColor: 0,
+    moveSideToFColor: 0,
 };
 
 const parseCommands = () => {
@@ -267,18 +267,15 @@ const TBPHA = () => {
     TBHA();
 };
 
-// TODO: Find better name for variable and method
-const findSide = () => {
+const moveSideToF = () => {
     for (let i = 0; i < 2; i++) { // repeat 2 times
         for (let j = 0; j < 4; j++) { // repeat 4 times
-            if ($.F[5] === $.searchedSideColor) {
+            if ($.F[5] === $.moveSideToFColor) {
                 return;
             }
-            $.commandText = `TB`;
-            executeCommands();
+            executeCommands($.commandText = `TB`);
         }
-        $.commandText = `TA`;
-        executeCommands();
+        executeCommands($.commandText = `TA`);
     }
 };
 
@@ -296,7 +293,7 @@ shuffle($, executeCommands); // TODO: Remove
 logCube($);
 
 console.log(`Make daisy`);
-findSide($.searchedSideColor = `y`);
+moveSideToF($.moveSideToFColor = `y`);
 while ($.F[2] !== `w` || $.F[4] !== `w` || $.F[6] !== `w` || $.F[8] !== `w`) {
     if ($.B[2] === `w` || $.B[4] === `w` || $.B[6] === `w` || $.B[8] === `w`) {
         // console.log(`Move white tile from back to yellow front`);
@@ -328,7 +325,7 @@ while ($.F[2] !== `w` || $.F[4] !== `w` || $.F[6] !== `w` || $.F[8] !== `w`) {
 
         executeCommands($.commandText = `TBPHA`);
     }
-    findSide($.searchedSideColor = `y`);
+    moveSideToF($.moveSideToFColor = `y`);
 }
 logCube($);
 

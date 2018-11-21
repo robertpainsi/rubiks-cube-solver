@@ -19,9 +19,11 @@ export const createList = (() => {
         },
         set: (obj, prop, value) => {
             if (isIndex(prop)) {
-                return obj[prop - 1] = value;
+                obj[prop - 1] = value;
+                return true;
             } else {
-                return obj[prop] = value;
+                obj[prop] = value;
+                return true;
             }
         },
         get: (obj, prop) => {
@@ -48,7 +50,11 @@ export const repeat = (times, callback) => {
     }
 };
 
-export const setArduinoDigintalPin = (pin, value) => {
+export const setArduinoDigitalPin = (pin, value) => {
+};
+
+export const getArduinoAnalogPin = (pin) => {
+    return Math.floor(Math.random() * Math.floor(256));
 };
 
 export const parallel = (...functions) => {

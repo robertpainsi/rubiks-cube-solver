@@ -1,6 +1,6 @@
 'use strict';
 
-import {createList, parallel, repeat, setArduinoDigintalPin} from "./pocket_code";
+import {createList, getArduinoAnalogPin, parallel, repeat, setArduinoDigitalPin} from "./pocket_code";
 import {colorizeBlock, logCube, shuffle} from "./utils";
 import assert from "./assert";
 
@@ -31,6 +31,9 @@ const $ = {
     currentMotorDirection: 0,
     currentMotorStepperPin: 0,
     currentMotorSteps: 0,
+
+    currentReadPin: 0,
+    currentReadColor: 0,
 };
 
 /** Command handler */
@@ -322,19 +325,18 @@ const restoreCube = () => {
 
 /** Motor */
 const triggerCurrentMotor = () => {
-    setArduinoDigintalPin(motorA.currentMotorDirectionPin, $.currentMotorDirection);
+    setArduinoDigitalPin(motorA.currentMotorDirectionPin, $.currentMotorDirection);
     repeat($.currentMotorSteps, () => { // TODO: Change to broadcasting to improve speed
-        setArduinoDigintalPin($.turnStepperPin, 0);
-        setArduinoDigintalPin($.turnStepperPin, 1);
+        setArduinoDigitalPin($.turnStepperPin, 0);
+        setArduinoDigitalPin($.turnStepperPin, 1);
     });
 };
 
-const turnMotorClockwise = () => {
-
+const turnCurrentMotorClockwise = () => {
     triggerCurrentMotor();
 };
 
-const turnMotorCounterclockwise = () => {
+const turnCurrentMotorCounterclockwise = () => {
     $.currentMotorDirection = 0;
     triggerCurrentMotor();
 };
@@ -351,58 +353,77 @@ const turnMotorAClockwise = () => {
     $.currentMotorDirectionPin = motorA.turnDirectionPin;
     $.currentMotorStepperPin = motorA.turnStepperPin;
     $.currentMotorSteps = 100;
-    turnMotorClockwise();
+    turnCurrentMotorClockwise();
 };
 const turnMotorACounterclockwise = () => {
     $.currentMotorDirectionPin = motorA.turnDirectionPin;
     $.currentMotorStepperPin = motorA.turnStepperPin;
     $.currentMotorSteps = 100;
-    turnMotorCounterclockwise();
+    turnCurrentMotorCounterclockwise();
 };
 const holdMotorA = () => {
     $.currentMotorDirectionPin = motorA.holdReleaseDirectionPin;
     $.currentMotorStepperPin = motorA.holdReleaseStepperPin;
     $.currentMotorSteps = 50;
-    turnMotorClockwise();
+    turnCurrentMotorClockwise();
 };
 const releaseMotorA = () => {
     $.currentMotorDirectionPin = motorA.holdReleaseDirectionPin;
     $.currentMotorStepperPin = motorA.holdReleaseStepperPin;
     $.currentMotorSteps = 50;
-    turnMotorCounterclockwise();
+    turnCurrentMotorCounterclockwise();
 };
 
 /** Motor B */
 /* TODO: setup() */
 const motorB = {
-    turnStepperPin: 6,
-    turnDirectionPin: 7,
-    holdReleaseStepperPin: 8,
-    holdReleaseDirectionPin: 9,
+    turnDirectionPin: 6,
+    turnStepperPin: 7,
+    holdReleaseDirectionPin: 8,
+    holdReleaseStepperPin: 9,
 };
 const turnMotorBClockwise = () => {
     $.currentMotorDirectionPin = motorB.turnDirectionPin;
     $.currentMotorStepperPin = motorB.turnStepperPin;
     $.currentMotorSteps = 100;
-    turnMotorClockwise();
+    turnCurrentMotorClockwise();
 };
 const turnMotorBCounterclockwise = () => {
     $.currentMotorDirectionPin = motorB.turnDirectionPin;
     $.currentMotorStepperPin = motorB.turnStepperPin;
     $.currentMotorSteps = 100;
-    turnMotorCounterclockwise();
+    turnCurrentMotorCounterclockwise();
 };
 const holdMotorB = () => {
     $.currentMotorDirectionPin = motorB.holdReleaseDirectionPin;
     $.currentMotorStepperPin = motorB.holdReleaseStepperPin;
     $.currentMotorSteps = 50;
-    turnMotorClockwise();
+    turnCurrentMotorClockwise();
 };
 const releaseMotorB = () => {
     $.currentMotorDirectionPin = motorB.holdReleaseDirectionPin;
     $.currentMotorStepperPin = motorB.holdReleaseStepperPin;
     $.currentMotorSteps = 50;
-    turnMotorCounterclockwise();
+    turnCurrentMotorCounterclockwise();
+};
+
+/** Motor C */
+/* TODO: setup() */
+const motorC = {
+    directionPin: 10,
+    stepperPin: 11,
+};
+const turnColorReaderToCube = () => {
+    $.currentMotorDirectionPin = motorC.directionPin;
+    $.currentMotorStepperPin = motorC.stepperPin;
+    $.currentMotorSteps = 100;
+    turnCurrentMotorClockwise();
+};
+const turnColorReaderAwayFromCube = () => {
+    $.currentMotorDirectionPin = motorC.directionPin;
+    $.currentMotorStepperPin = motorC.stepperPin;
+    $.currentMotorSteps = 100;
+    turnCurrentMotorCounterclockwise();
 };
 
 /** Main logic */
@@ -428,11 +449,13 @@ const setup = () => {
 };
 const main = () => {
     setup();
-
-    console.log(`Shuffle cube`);
-    shuffle($, executeCommands); // TODO: Remove
-    logCube($);
-
+    {
+        // TODO: Only for Javascript testing. Remove block on Catrobat.
+        console.log(`Shuffle cube`);
+        shuffle($, executeCommands);
+        logCube($);
+    }
+    readCubeColors();
     makeDaisy();
     finishWhiteCross();
     finishWhiteFace();
@@ -443,6 +466,36 @@ const main = () => {
     orientYellowCorners();
 
     assert.cube($);
+};
+
+/** Step: Read cube colors */
+const readCubeColors = () => {
+    return; // TODO: Only for Javascript testing. Remove line on Catrobat.
+
+    const cubeIndex = createList([1, 2, 3, 6, 9, 8, 7, 4]);
+    repeat(2, () => {
+        repeat(4, () => {
+            for (let i = 1; i <= 4; i++) {
+                turnColorReaderToCube();
+
+                readCubeColor($.currentReadPin = 0);
+                $.F[cubeIndex[(i - 1) * 2 + 1]] = $.currentReadColor;
+                readCubeColor($.currentReadPin = 1);
+                $.F[cubeIndex[(i - 1) * 2 + 2]] = $.currentReadColor;
+                readCubeColor($.currentReadPin = 2);
+                $.F[5] = $.currentReadColor;
+
+                turnColorReaderAwayFromCube();
+                executeCommands($.commandText = `TA`);
+            }
+            executeCommands($.commandText = `TB`);
+        });
+        executeCommands($.commandText = `TA`);
+    });
+};
+const readCubeColor = () => {
+    // TODO: Replace dummy code with real implementation
+    $.currentReadColor = getArduinoAnalogPin($.currentReadPin);
 };
 
 /** Step: Make daisy */
@@ -562,7 +615,7 @@ const finishSecondLayer = () => {
         console.log(`Finish second layer colors`, colorizeBlock(c1), colorizeBlock(c2));
         logCube($);
 
-        for (let i = 0; i < 4; i++) {
+        for (let k = 0; k < 4; k++) {
             if (($.F[6] === c1 || $.F[6] === c2) && ($.R[4] === c1 || $.R[4] === c2)) {
                 righty();
                 righty();

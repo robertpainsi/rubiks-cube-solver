@@ -1,6 +1,6 @@
 'use strict';
 
-import {createList} from "./pocket_code";
+import {createList, repeat} from "./pocket_code";
 import {colorizeBlock, logCube, shuffle} from "./utils";
 import assert from "./assert";
 
@@ -365,12 +365,12 @@ const makeDaisy = () => {
 /** Step: Finish white cross */
 const finishWhiteCross = () => {
     console.log(`Finish white cross`);
-    for (let i = 0; i < 4; i++) { // repeat 4 times
+    repeat(4, () => {
         while (!($.F[8] === `w` && $.D[2] === $.D[5])) {
             executeCommands($.commandText = `TAHB`);
         }
         executeCommands($.commandText = `TBHA TBHA TA`);
-    }
+    });
     executeCommands($.commandText = `TB TA`);
     logCube($);
 
@@ -388,7 +388,7 @@ const finishWhiteFace = () => {
         logCube($);
 
         console.log(`Move away from white face`);
-        for (let j = 0; j < 4; j++) { // repeat 4 times
+        repeat(4, () => {
             if (
                 ($.F[3] === `w` || $.U[9] === `w` || $.R[1] === `w`) &&
                 ($.F[3] === c1 || $.U[9] === c1 || $.R[1] === c1) &&
@@ -398,7 +398,7 @@ const finishWhiteFace = () => {
             } else {
                 executeCommands($.commandText = `TB`);
             }
-        }
+        });
         logCube($);
 
         console.log('Colored corner on correct faces, F,U,R = F,R,`w`');
@@ -540,8 +540,8 @@ const finishYellowEdges = () => {
 /** Step: Move yellow corners to their places */
 const moveYellowCornersToTheirPlaces = () => {
     console.log(`Move corners to their places`);
-    for (let i = 1; i <= 4; i++) { // repeat 4 times
-        for (let k = 1; k <= 3; k++) { // repeat 3 times
+    repeat(4, () => {
+        repeat(3, () => {
             if (!(
                     ($.F[5] === $.F[9] || $.F[5] === $.R[7] || $.F[5] === $.D[3])
                     && ($.R[5] === $.F[9] || $.R[5] === $.R[7] || $.R[5] === $.D[3])
@@ -568,9 +568,9 @@ const moveYellowCornersToTheirPlaces = () => {
                     + ` FLD(${colorizeBlock($.F[7])}${colorizeBlock($.L[9])}${colorizeBlock($.D[1])})`
                 );
             }
-        }
+        });
         executeCommands($.commandText = `TB`);
-    }
+    });
     logCube($);
 
     console.log(`Corners: FRD(${colorizeBlock($.F[9])}${colorizeBlock($.R[7])}${colorizeBlock($.D[3])})`
@@ -588,7 +588,7 @@ const orientYellowCorners = () => {
     while (!($.U[1] === `y` && $.U[3] === `y` && $.U[7] === `y` && $.U[9] === `y`)) {
         console.log(`Orient yellow corner`);
         logCube($);
-        for (let k = 1; k <= 4; k++) { // repeat 4 times
+        repeat(4, () => {
             if ($.U[9] !== 'y') {
                 // R' D' R D
                 executeCommands($.commandText = `TBP TAPHB TB`);
@@ -596,16 +596,16 @@ const orientYellowCorners = () => {
                 executeCommands($.commandText = `TBP TAHB TB`);
                 executeCommands($.commandText = `TBHA`);
             }
-        }
+        });
         logCube($);
 
         console.log(`Rotate to next yellow corner not facing correctly`);
         executeCommands($.commandText = `TA TA`);
-        for (let k = 1; k <= 4; k++) { // repeat 4 times
+        repeat(4, () => {
             if ($.D[1] === 'y') {
                 executeCommands($.commandText = `TBPHA`);
             }
-        }
+        });
         executeCommands($.commandText = `TA TA`);
         logCube($);
     }

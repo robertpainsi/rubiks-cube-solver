@@ -16,6 +16,6 @@ Limitations because of Catrobat/Pocket Code and other notes:
 
 - Strings still start at index 0.
 
-- Some methods are only used for output, verification and similar. Every method that isn't declared in `src/index.js` is optional and can be skipped when translated to Catrobat/Pocket Code. `src/pocket-code.js` implements features that simulate features that are supported out of the box in Catrobat/Pocket Code but not in JavaScript.
+- Some methods are only used for output, verification and similar. Every method that isn't declared in `src/index.js` is optional and can be skipped when translated to Catrobat/Pocket Code. `src/pocket-code.js` implements features that are supported out of the box in Catrobat/Pocket Code but not in JavaScript.
 
 - The global context `$` stores all program variables accessible by all objects at all time.

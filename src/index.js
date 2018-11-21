@@ -1,6 +1,6 @@
 'use strict';
 
-import {createList, repeat} from "./pocket_code";
+import {createList, repeat, setArduinoDigintalPin} from "./pocket_code";
 import {colorizeBlock, logCube, shuffle} from "./utils";
 import assert from "./assert";
 
@@ -26,6 +26,11 @@ const $ = {
     commandText: ``,
 
     moveFaceToFColor: 0,
+
+    currentMotorDirectionPin: 0,
+    currentMotorDirection: 0,
+    currentMotorStepperPin: 0,
+    currentMotorSteps: 0,
 };
 
 /** Command handler */
@@ -263,28 +268,93 @@ const restoreCube = () => {
     }
 };
 
+/** Motor */
+const triggerCurrentMotor = () => {
+    setArduinoDigintalPin(motorA.currentMotorDirectionPin, $.currentMotorDirection);
+    repeat($.currentMotorSteps, () => { // TODO: Change to broadcasting to improve speed
+        setArduinoDigintalPin($.turnStepperPin, 0);
+        setArduinoDigintalPin($.turnStepperPin, 1);
+    });
+};
+
+const turnMotorClockwise = () => {
+
+    triggerCurrentMotor();
+};
+
+const turnMotorCounterclockwise = () => {
+    $.currentMotorDirection = 0;
+    triggerCurrentMotor();
+};
+
 /** Motor A */
+/* TODO: setup() */
+const motorA = {
+    turnDirectionPin: 2,
+    turnStepperPin: 3,
+    holdReleaseDirectionPin: 4,
+    holdReleaseStepperPin: 5,
+};
 const turnMotorAClockwise = () => {
+    $.currentMotorDirectionPin = motorA.turnDirectionPin;
+    $.currentMotorStepperPin = motorA.turnStepperPin;
+    $.currentMotorSteps = 100;
+    turnMotorClockwise();
 };
 const turnMotorACounterclockwise = () => {
+    $.currentMotorDirectionPin = motorA.turnDirectionPin;
+    $.currentMotorStepperPin = motorA.turnStepperPin;
+    $.currentMotorSteps = 100;
+    turnMotorCounterclockwise();
 };
 const holdMotorA = () => {
+    $.currentMotorDirectionPin = motorA.holdReleaseDirectionPin;
+    $.currentMotorStepperPin = motorA.holdReleaseStepperPin;
+    $.currentMotorSteps = 50;
+    turnMotorClockwise();
 };
 const releaseMotorA = () => {
+    $.currentMotorDirectionPin = motorA.holdReleaseDirectionPin;
+    $.currentMotorStepperPin = motorA.holdReleaseStepperPin;
+    $.currentMotorSteps = 50;
+    turnMotorCounterclockwise();
 };
 
 /** Motor B */
+/* TODO: setup() */
+const motorB = {
+    turnStepperPin: 6,
+    turnDirectionPin: 7,
+    holdReleaseStepperPin: 8,
+    holdReleaseDirectionPin: 9,
+};
 const turnMotorBClockwise = () => {
+    $.currentMotorDirectionPin = motorB.turnDirectionPin;
+    $.currentMotorStepperPin = motorB.turnStepperPin;
+    $.currentMotorSteps = 100;
+    turnMotorClockwise();
 };
 const turnMotorBCounterclockwise = () => {
+    $.currentMotorDirectionPin = motorB.turnDirectionPin;
+    $.currentMotorStepperPin = motorB.turnStepperPin;
+    $.currentMotorSteps = 100;
+    turnMotorCounterclockwise();
 };
 const holdMotorB = () => {
+    $.currentMotorDirectionPin = motorB.holdReleaseDirectionPin;
+    $.currentMotorStepperPin = motorB.holdReleaseStepperPin;
+    $.currentMotorSteps = 50;
+    turnMotorClockwise();
 };
 const releaseMotorB = () => {
+    $.currentMotorDirectionPin = motorB.holdReleaseDirectionPin;
+    $.currentMotorStepperPin = motorB.holdReleaseStepperPin;
+    $.currentMotorSteps = 50;
+    turnMotorCounterclockwise();
 };
 
 /** Main logic */
-const main = () => {
+const setup = () => {
     for (let i = 1; i <= 9; i++) {
         $.F[i] = `w`;
         $.B[i] = `y`;
@@ -303,6 +373,9 @@ const main = () => {
     $.horizontalEdges.push(`r`);
     $.horizontalEdges.push(`r`);
     $.horizontalEdges.push(`b`);
+};
+const main = () => {
+    setup();
 
     console.log(`Shuffle cube`);
     shuffle($, executeCommands); // TODO: Remove

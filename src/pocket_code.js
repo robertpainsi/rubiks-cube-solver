@@ -47,3 +47,6 @@ export const repeat = (times, callback) => {
         }
     }
 };
+
+export const setArduinoDigintalPin = (pin, value) => {
+};

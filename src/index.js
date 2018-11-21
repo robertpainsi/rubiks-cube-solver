@@ -1,6 +1,6 @@
 'use strict';
 
-import {createList, getArduinoAnalogPin, parallel, repeat, setArduinoDigitalPin} from "./pocket_code";
+import {createList, getArduinoAnalogPin, parallel, repeat, setArduinoDigitalPin} from "./pocket-code";
 import {colorizeBlock, logCube, shuffle} from "./utils";
 import assert from "./assert";
 

@@ -4,7 +4,7 @@ import {createList, getArduinoAnalogPin, parallel, repeat, setArduinoDigitalPin}
 import {colorizeBlock, logCube, shuffle} from "./utils";
 import assert from "./assert";
 
-/** Global variables/lists */
+/** Program variables/lists */
 const $ = {
     horizontalEdges: createList(),
 

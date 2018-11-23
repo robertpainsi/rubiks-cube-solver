@@ -1,5 +1,5 @@
 # Rubik's Cube solver
-This Node.js JavaScript program solves a 3x3 Rubik's Cube by using features that are only available in Catrobat/Pocket Code. This way it can easily be converted and run on such environment.
+This Node.js JavaScript program solves a 3x3 Rubik's Cube by using features that are only available in Catrobat/Pocket Code. This way it can easily be converted and run on such environment. So some code may look odd or could be much more easily fixed in pure and modern JavaScript.
 
 Limitations because of Catrobat/Pocket Code and other notes:
 

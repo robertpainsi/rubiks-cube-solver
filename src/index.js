@@ -577,7 +577,7 @@ const finishSecondLayer = () => {
         console.log(`Finish second layer colors`, colorizeBlock(c1), colorizeBlock(c2));
         logCube($);
 
-        for (let k = 0; k < 4; k++) {
+        repeat(4, () => {
             if (($.F[6] === c1 || $.F[6] === c2) && ($.R[4] === c1 || $.R[4] === c2)) {
                 righty();
                 righty();
@@ -589,7 +589,7 @@ const finishSecondLayer = () => {
             } else {
                 TB();
             }
-        }
+        });
 
         while (!(($.F[8] === c1 || $.F[8] === c2) && ($.D[2] === c1 || $.D[2] === c2))) {
             TBHA();

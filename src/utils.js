@@ -33,12 +33,8 @@ export const colorizeBlock = (b) => {
         .replace(/o/g, orange(`o`));
 };
 
-export const shuffle = ($, executeCommands) => {
-    const commandsPool = [`TA`, `TB`, `TAHB`, `TBHA`];
-    const commands = [];
+export const shuffle = ($, commands) => {
     for (let i = 0; i < 128; i++) {
-        commands.push(commandsPool[Math.floor(Math.random() * commandsPool.length)]);
+        commands[Math.floor(Math.random() * commands.length)]();
     }
-    $.commandText = commands.join(` `);
-    executeCommands();
 };

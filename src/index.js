@@ -22,9 +22,6 @@ const $ = {
     UB: createList(),
     DB: createList(),
 
-    commands: createList(),
-    commandText: 0,
-
     moveFaceToFColor: 0,
 
     currentMotorDirectionPin: 0,
@@ -37,55 +34,6 @@ const $ = {
 };
 
 /** Command handler */
-const parseCommands = () => {
-    while ($.commands.length) {
-        delete $.commands[1];
-    }
-    let insertNewItem = true;
-    for (let i = 0; i < $.commandText.length; i++) { // TODO: Adapt to Catrobat text indices [1...length]
-        let c = $.commandText[i];
-        if (c === ` `) {
-            insertNewItem = true;
-        } else {
-            if (insertNewItem) {
-                $.commands.push(c);
-                insertNewItem = false;
-            } else {
-                $.commands[$.commands.length] = $.commands[$.commands.length] + c;
-            }
-        }
-    }
-    $.commandText = ``;
-};
-
-const executeCommands = () => {
-    parseCommands();
-    while ($.commands.length) {
-        // console.log($.commands[1]);
-        if ($.commands[1] === `TA`) {
-            TA();
-        } else if ($.commands[1] === `TAP`) {
-            TAP();
-        } else if ($.commands[1] === `TB`) {
-            TB();
-        } else if ($.commands[1] === `TBP`) {
-            TBP();
-        } else if ($.commands[1] === `TAHB`) {
-            TAHB();
-        } else if ($.commands[1] === `TAPHB`) {
-            TAPHB();
-        } else if ($.commands[1] === `TBHA`) {
-            TBHA();
-        } else if ($.commands[1] === `TBPHA`) {
-            TBPHA();
-        } else {
-            console.error(`Unknown command`, $.commands[1]);
-            process.exit();
-        }
-        delete $.commands[1];
-    }
-};
-
 // Turn cube clockwise on X-axis
 const TA = () => {
     parallel(TA_Motor, TA_Data);
@@ -286,18 +234,24 @@ const moveFaceToF = () => {
             if ($.F[5] === $.moveFaceToFColor) {
                 return;
             }
-            executeCommands($.commandText = `TB`);
+            TB();
         }
-        executeCommands($.commandText = `TA`);
+        TA();
     }
 };
 
 const righty = () => {
-    executeCommands($.commandText = `TAHB TBHA TAPHB TBPHA`);
+    TAHB();
+    TBHA();
+    TAPHB();
+    TBPHA();
 };
 
 const lefty = () => {
-    executeCommands($.commandText = `TAPHB TBHA TAHB TBPHA`);
+    TAPHB();
+    TBHA();
+    TAHB();
+    TBPHA();
 };
 
 /** Data utils */
@@ -452,7 +406,7 @@ const main = () => {
     {
         // TODO: Only for Javascript testing. Remove block on Catrobat.
         console.log(`Shuffle cube`);
-        shuffle($, executeCommands);
+        shuffle($, [TA, TAP, TB, TBP, TAHB, TAPHB, TBHA, TBPHA]);
         logCube($);
     }
     readCubeColors();
@@ -486,11 +440,11 @@ const readCubeColors = () => {
                 $.F[5] = $.currentReadColor;
 
                 turnColorReaderAwayFromCube();
-                executeCommands($.commandText = `TA`);
+                TA();
             }
-            executeCommands($.commandText = `TB`);
+            TB();
         });
-        executeCommands($.commandText = `TA`);
+        TA();
     });
 };
 const readCubeColor = () => {
@@ -505,33 +459,38 @@ const makeDaisy = () => {
     while ($.F[2] !== `w` || $.F[4] !== `w` || $.F[6] !== `w` || $.F[8] !== `w`) {
         if ($.B[2] === `w` || $.B[4] === `w` || $.B[6] === `w` || $.B[8] === `w`) {
             // console.log(`Move white tile from back to yellow front`);
-            executeCommands($.commandText = `TB TB`);
+            TB();
+            TB();
             while ($.F[8] !== `w`) {
-                executeCommands($.commandText = `TAHB`);
+                TAHB();
             }
-            executeCommands($.commandText = `TB TB`);
+            TB();
+            TB();
             while ($.F[8] === `w`) {
-                executeCommands($.commandText = `TAHB`);
+                TAHB();
             }
-            executeCommands($.commandText = `TBHA TBHA`);
+            TBHA();
+            TBHA();
         } else {
             // console.log(`Move white tile from side to yellow front face`);
             while ($.D[2] !== `w` && $.D[4] !== `w` && $.D[6] !== `w` && $.D[8] !== `w`) {
-                executeCommands($.commandText = `TA`);
+                TA();
             }
             while ($.F[8] === `w`) {
-                executeCommands($.commandText = `TAHB`);
+                TAHB();
             }
             while ($.D[4] !== `w`) {
-                executeCommands($.commandText = `TBHA`);
+                TBHA();
             }
-            executeCommands($.commandText = `TA TA TA`);
+            TA();
+            TA();
+            TA();
 
             while ($.F[8] === `w`) { // optional?
-                executeCommands($.commandText = `TAHB`);
+                TAHB();
             }
 
-            executeCommands($.commandText = `TBPHA`);
+            TBPHA();
         }
         moveFaceToF($.moveFaceToFColor = `y`);
     }
@@ -545,11 +504,14 @@ const finishWhiteCross = () => {
     console.log(`Finish white cross`);
     repeat(4, () => {
         while (!($.F[8] === `w` && $.D[2] === $.D[5])) {
-            executeCommands($.commandText = `TAHB`);
+            TAHB();
         }
-        executeCommands($.commandText = `TBHA TBHA TA`);
+        TBHA();
+        TBHA();
+        TA();
     });
-    executeCommands($.commandText = `TB TA`);
+    TB();
+    TA();
     logCube($);
 
     assert.whiteCross($);
@@ -574,14 +536,14 @@ const finishWhiteFace = () => {
             ) {
                 righty();
             } else {
-                executeCommands($.commandText = `TB`);
+                TB();
             }
         });
         logCube($);
 
         console.log('Colored corner on correct faces, F,U,R = F,R,`w`');
         while ($.F[5] !== c1) {
-            executeCommands($.commandText = `TB`);
+            TB();
         }
         logCube($);
         while (!(
@@ -589,7 +551,7 @@ const finishWhiteFace = () => {
             ($.F[9] === c1 || $.D[3] === c1 || $.R[7] === c1) &&
             ($.F[9] === c2 || $.D[3] === c2 || $.R[7] === c2)
         )) {
-            executeCommands($.commandText = `TBHA`);
+            TBHA();
         }
         logCube($);
 
@@ -619,36 +581,39 @@ const finishSecondLayer = () => {
             if (($.F[6] === c1 || $.F[6] === c2) && ($.R[4] === c1 || $.R[4] === c2)) {
                 righty();
                 righty();
-                executeCommands($.commandText = `TBPHA`);
+                TBPHA();
                 righty();
                 righty();
                 righty();
                 righty();
             } else {
-                executeCommands($.commandText = `TB`);
+                TB();
             }
         }
 
         while (!(($.F[8] === c1 || $.F[8] === c2) && ($.D[2] === c1 || $.D[2] === c2))) {
-            executeCommands($.commandText = `TBHA`);
+            TBHA();
         }
         while (!($.F[5] === $.F[8] && ($.F[5] === c1 || $.F[5] === c2))) {
-            executeCommands($.commandText = `TBHA TBP`);
+            TBHA();
+            TBP();
         }
         if ($.L[5] === c1 || $.L[5] === c2) {
-            executeCommands($.commandText = `TBHA TBHA`);
+            TBHA();
+            TBHA();
             lefty();
             lefty();
-            executeCommands($.commandText = `TBHA`);
+            TBHA();
             lefty();
             lefty();
             lefty();
             lefty();
         } else if ($.R[5] === c1 || $.R[5] === c2) {
-            executeCommands($.commandText = `TBHA TBHA`);
+            TBHA();
+            TBHA();
             righty();
             righty();
-            executeCommands($.commandText = `TBHA`);
+            TBHA();
             righty();
             righty();
             righty();
@@ -676,12 +641,14 @@ const finishYellowCross = () => {
         || ($.D[2] === `y` && $.D[4] === `y`)
         || ($.D[2] === `y` && $.D[6] === `y`)
         || ($.D[4] === `y` && $.D[8] === `y`)) {
-            executeCommands($.commandText = `TB`);
+            TB();
         }
 
-        executeCommands($.commandText = `TAHB TB`);
+        TAHB();
+        TB();
         righty();
-        executeCommands($.commandText = `TBP TAPHB`);
+        TBP();
+        TAPHB();
 
         assert.firstAndSecondLayer($);
     }
@@ -701,11 +668,19 @@ const finishYellowEdges = () => {
     )) {
         if ($.R[5] !== $.R[8]) {
             console.log(`Swap edges`);
-            executeCommands($.commandText = `TAHB TBHA TAPHB TBHA TAHB TBHA TBHA TAPHB TBHA`);
+            TAHB();
+            TBHA();
+            TAPHB();
+            TBHA();
+            TAHB();
+            TBHA();
+            TBHA();
+            TAPHB();
+            TBHA();
             logCube($);
         }
         console.log(`Rotate cube`);
-        executeCommands($.commandText = `TB`);
+        TB();
         logCube($);
 
         assert.yellowCross($);
@@ -733,11 +708,26 @@ const moveYellowCornersToTheirPlaces = () => {
                     + ` FLD(${colorizeBlock($.F[7])}${colorizeBlock($.L[9])}${colorizeBlock($.D[1])})`
                 );
 
-                executeCommands($.commandText = `TBP`);
+                TBP();
                 //  U R U' L' U R' U' L
                 //  BRD-corner stays they same, other three D corners rotate
-                executeCommands($.commandText = `TBHA TAHB TBPHA TB TB TAPHB TB TB TBHA TAPHB TBPHA TB TB TAHB TB TB`);
-                executeCommands($.commandText = `TB`);
+                TBHA();
+                TAHB();
+                TBPHA();
+                TB();
+                TB();
+                TAPHB();
+                TB();
+                TB();
+                TBHA();
+                TAPHB();
+                TBPHA();
+                TB();
+                TB();
+                TAHB();
+                TB();
+                TB();
+                TB();
                 logCube($);
 
                 console.log(`    FRD(${colorizeBlock($.F[9])}${colorizeBlock($.R[7])}${colorizeBlock($.D[3])})`
@@ -747,7 +737,7 @@ const moveYellowCornersToTheirPlaces = () => {
                 );
             }
         });
-        executeCommands($.commandText = `TB`);
+        TB();
     });
     logCube($);
 
@@ -762,34 +752,42 @@ const moveYellowCornersToTheirPlaces = () => {
 /** Step: Orient yellow corners */
 const orientYellowCorners = () => {
     console.log(`Orient yellow corners`);
-    executeCommands($.commandText = `TA TA`);
+    TA();
+    TA();
     while (!($.U[1] === `y` && $.U[3] === `y` && $.U[7] === `y` && $.U[9] === `y`)) {
         console.log(`Orient yellow corner`);
         logCube($);
         repeat(4, () => {
             if ($.U[9] !== 'y') {
                 // R' D' R D
-                executeCommands($.commandText = `TBP TAPHB TB`);
-                executeCommands($.commandText = `TBPHA`);
-                executeCommands($.commandText = `TBP TAHB TB`);
-                executeCommands($.commandText = `TBHA`);
+                TBP();
+                TAPHB();
+                TB();
+                TBPHA();
+                TBP();
+                TAHB();
+                TB();
+                TBHA();
             }
         });
         logCube($);
 
         console.log(`Rotate to next yellow corner not facing correctly`);
-        executeCommands($.commandText = `TA TA`);
+        TA();
+        TA();
         repeat(4, () => {
             if ($.D[1] === 'y') {
-                executeCommands($.commandText = `TBPHA`);
+                TBPHA();
             }
         });
-        executeCommands($.commandText = `TA TA`);
+        TA();
+        TA();
         logCube($);
     }
-    executeCommands($.commandText = `TA TA`);
+    TA();
+    TA();
     while ($.F[5] !== $.F[8]) {
-        executeCommands($.commandText = `TBHA`);
+        TBHA();
     }
     console.log(`Done`);
     logCube($);

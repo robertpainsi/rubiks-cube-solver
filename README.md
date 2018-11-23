@@ -3,6 +3,8 @@ This Node.js JavaScript program solves a 3x3 Rubik's Cube by using features that
 
 Limitations because of Catrobat/Pocket Code and other notes:
 
+- Arrays are only one-dimensional
+
 - Read all `TODO` comments in `src/index.js` and adapt your Catrobat/Pocket Code code accordingly.
 
 - By using `Proxy`s and `createList`, JavaScript arrays (lists) start at index 1 now, as they do in Catrobat/Pocket Code.

@@ -16,7 +16,7 @@ const sideToArray = (side) => {
 export const logCube = ($) => {
     for (let i = 0; i < 3; i++) {
         let line = ``;
-        [`F`, `R`, `B`, `L`, `D`, `U`].forEach((sideName) => {
+        [`F`, `R`, `B`, `L`, `U`, `D`].forEach((sideName) => {
             line += colorizeBlock(` ${(i === 0) ? `${sideName}` : ` `}|${sideToArray($[sideName])[i].join(' ')}|`);
         });
         console.log(line);
@@ -35,6 +35,6 @@ export const colorizeBlock = (b) => {
 
 export const shuffle = ($, commands) => {
     for (let i = 0; i < 128; i++) {
-        commands[Math.floor(Math.random() * commands.length)]();
+        commands[Math.floor(Math.random() * commands.length)](true);
     }
 };

@@ -15,12 +15,12 @@ export default {
         }
     },
     whiteCross: function ($) {
-        if (!($.D[5] === `y`
-                && $.U[2] === `w` && $.U[4] === `w` && $.U[5] === `w` && $.U[6] === `w` && $.U[8] === `w`
-                && $.F[2] === $.F[5]
-                && $.B[2] === $.B[5]
-                && $.L[2] === $.L[5]
-                && $.R[2] === $.R[5]
+        if (!($.F[5] === `y`
+                && $.B[2] === `w` && $.B[4] === `w` && $.B[5] === `w` && $.B[6] === `w` && $.B[8] === `w`
+                && $.U[2] === $.U[5]
+                && $.R[6] === $.R[5]
+                && $.D[8] === $.D[5]
+                && $.L[4] === $.L[5]
             )) {
             console.error(`Wrong white cross!`);
             logCube($);
@@ -29,8 +29,8 @@ export default {
     },
     whiteSide: function ($) {
         for (let i = 1; i <= 9; i++) {
-            if ($.U[i] !== `w`) {
-                console.error(`U isn't completely white!`);
+            if ($.B[i] !== `w`) {
+                console.error(`B isn't completely white!`);
                 logCube($);
                 process.exit();
             }
@@ -38,31 +38,39 @@ export default {
     },
     ts: function ($) {
         this.whiteSide($);
-        [$.F, $.B, $.L, $.R].forEach((side) => {
-            for (let i = 1; i <= 3; i++) {
-                if (side[i] !== side[5]) {
-                    console.error(`T's aren't complete!`);
-                    logCube($);
-                    process.exit();
-                }
-            }
-        });
+        if (
+            $.U[2] !== $.U[5]
+            || $.R[6] !== $.R[5]
+            || $.D[8] !== $.D[5]
+            || $.L[4] !== $.L[5]
+        ) {
+            console.error(`T's aren't complete!`);
+            logCube($);
+            process.exit();
+        }
     },
     firstAndSecondLayer: function ($) {
-        this.whiteSide($);
-        [$.F, $.B, $.L, $.R].forEach((side) => {
-            for (let i = 1; i <= 6; i++) {
-                if (side[i] !== side[5]) {
+        this.ts($);
+
+        for (let [sideName, indices] of Object.entries({
+            U: [1, 2, 3, 4, 5, 6],
+            R: [2, 3, 5, 6, 8, 9],
+            D: [4, 5, 6, 7, 8, 9],
+            L: [1, 2, 4, 5, 7, 8],
+        })) {
+            const side = $[sideName];
+            indices.every((index) => {
+                if (side[indices[0]] !== side[index]) {
                     console.error(`1 and 2 layers aren't complete!`);
                     logCube($);
                     process.exit();
                 }
-            }
-        });
+            })
+        }
     },
     yellowCross: function ($) {
         this.firstAndSecondLayer($);
-        if (!($.D[5] === `y` && $.D[2] === `y` && $.D[4] === `y` && $.D[6] === `y` && $.D[8] === `y`)) {
+        if (!($.F[2] === `y` && $.F[4] === `y` && $.F[5] === `y` && $.F[6] === `y` && $.F[8] === `y`)) {
             console.error(`Wrong yellow cross!`);
             logCube($);
             process.exit();
@@ -70,25 +78,36 @@ export default {
     },
     yellowCrossEdges: function ($) {
         this.yellowCross($);
-        if (!($.F[5] === $.F[8] && $.R[5] === $.R[8] && $.B[5] === $.B[8] && $.L[5] === $.L[8])) {
+        if (!($.U[5] === $.U[8] && $.R[5] === $.R[4] && $.D[5] === $.D[2] && $.L[5] === $.L[6])) {
             console.error(`Wrong yellow cross!`);
             logCube($);
             process.exit();
         }
     },
     yellowCrossEdgesAndCorners: function ($) {
-        this.yellowCross($);
-        if ([
-                {A: $.F, B: $.R, C: 3},
-                {A: $.R, B: $.B, C: 9},
-                {A: $.B, B: $.L, C: 7},
-                {A: $.L, B: $.F, C: 1},
-            ].some((corner) => {
-                return !(
-                    (corner.A[5] === corner.A[9] || corner.A[5] === corner.B[7] || corner.A[5] === $.D[corner.C])
-                    && (corner.B[5] === corner.A[9] || corner.B[5] === corner.B[7] || corner.B[5] === $.D[corner.C])
-                    && (`y` === corner.A[9] || `y` === corner.B[7] || `y` === $.D[corner.C])
-                );
+        this.yellowCrossEdges($);
+        if (![
+                {
+                    name: `FUL`,
+                    A: [$.F[5], $.U[5], $.L[5]],
+                    B: [$.F[1], $.U[7], $.L[3]]
+                }, {
+                    name: `FUR`,
+                    A: [$.F[5], $.U[5], $.R[5]],
+                    B: [$.F[3], $.U[9], $.R[1]]
+                }, {
+                    name: `FDL`,
+                    A: [$.F[5], $.D[5], $.L[5]],
+                    B: [$.F[7], $.D[1], $.L[9]]
+                }, {
+                    name: `FDR`,
+                    A: [$.F[5], $.D[5], $.R[5]],
+                    B: [$.F[9], $.D[3], $.R[7]]
+                },
+            ].every((o) => {
+                return o.A.every((x) => {
+                    return o.B.includes(x);
+                });
             })) {
             console.error(`Wrong yellow corners position!`);
             logCube($);

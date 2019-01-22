@@ -1,6 +1,6 @@
 'use strict';
 
-import {createList, getArduinoAnalogPin, parallel, repeat, setArduinoDigitalPin} from "./pocket-code";
+import {createList, repeat} from "./pocket-code";
 import {colorizeBlock, logCube, shuffle} from "./utils";
 import assert from "./assert";
 
@@ -23,30 +23,11 @@ const $ = {
     DB: createList(),
 
     moveFaceToFColor: 0,
-
-    currentMotorDirectionPin: 0,
-    currentMotorDirection: 0,
-    currentMotorStepperPin: 0,
-    currentMotorSteps: 0,
-
-    currentReadPin: 0,
-    currentReadColor: 0,
 };
 
 /** Command handler */
 // Turn cube clockwise on X-axis
 const TA = () => {
-    parallel(TA_Motor, TA_Data);
-};
-const TA_Motor = () => {
-    releaseMotorB();
-    turnMotorAClockwise();
-    holdMotorB();
-    releaseMotorA();
-    turnMotorACounterclockwise();
-    holdMotorA();
-};
-const TA_Data = () => {
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
@@ -66,35 +47,13 @@ const TA_Data = () => {
 
 // Turn cube counterclockwise on X-axis
 const TAP = () => {
-    parallel(TAP_Motor, TAP_Data);
-};
-const TAP_Motor = () => {
-    releaseMotorB();
-    turnMotorACounterclockwise();
-    holdMotorB();
-    releaseMotorA();
-    turnMotorAClockwise();
-    holdMotorA();
-};
-const TAP_Data = () => {
-    TA_Data();
-    TA_Data();
-    TA_Data();
+    TA();
+    TA();
+    TA();
 };
 
 // Turn cube clockwise on Y-axis
 const TB = () => {
-    parallel(TB_Motor, TB_Data);
-};
-const TB_Motor = () => {
-    releaseMotorA();
-    turnMotorBClockwise();
-    holdMotorA();
-    releaseMotorB();
-    turnMotorBCounterclockwise();
-    holdMotorB();
-};
-const TB_Data = () => {
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
@@ -114,33 +73,13 @@ const TB_Data = () => {
 
 // Turn cube counterclockwise on Y-axis
 const TBP = () => {
-    parallel(TBP_Motor, TBP_Data);
-};
-const TBP_Motor = () => {
-    releaseMotorA();
-    turnMotorBCounterclockwise();
-    holdMotorA();
-    releaseMotorB();
-    turnMotorBClockwise();
-    holdMotorB();
-};
-const TBP_Data = () => {
-    TB_Data();
-    TB_Data();
-    TB_Data();
+    TB();
+    TB();
+    TB();
 };
 
 // Turn F clockwise
 const TAHB = () => {
-    parallel(TAHB_Motor, TAHB_Data);
-};
-const TAHB_Motor = () => {
-    turnMotorAClockwise();
-    releaseMotorA();
-    turnMotorACounterclockwise();
-    holdMotorA();
-};
-const TAHB_Data = () => {
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
@@ -169,31 +108,13 @@ const TAHB_Data = () => {
 
 // Turn F counterclockwise
 const TAPHB = () => {
-    parallel(TAPHB_Motor, TAPHB_Data);
-};
-const TAPHB_Motor = () => {
-    turnMotorACounterclockwise();
-    releaseMotorA();
-    turnMotorAClockwise();
-    holdMotorA();
-};
-const TAPHB_Data = () => {
-    TAHB_Data();
-    TAHB_Data();
-    TAHB_Data();
+    TAHB();
+    TAHB();
+    TAHB();
 };
 
 // Turn D clockwise
 const TBHA = () => {
-    parallel(TBHA_Motor, TBHA_Data);
-};
-const TBHA_Motor = () => {
-    turnMotorBClockwise();
-    releaseMotorB();
-    turnMotorBCounterclockwise();
-    holdMotorB();
-};
-const TBHA_Data = () => {
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
@@ -213,18 +134,9 @@ const TBHA_Data = () => {
 
 // Turn D counterclockwise
 const TBPHA = () => {
-    parallel(TBPHA_Motor, TBPHA_Data);
-};
-const TBPHA_Motor = () => {
-    turnMotorBCounterclockwise();
-    releaseMotorB();
-    turnMotorBClockwise();
-    holdMotorB();
-};
-const TBPHA_Data = () => {
-    TBHA_Data();
-    TBHA_Data();
-    TBHA_Data();
+    TBHA();
+    TBHA();
+    TBHA();
 };
 
 /** Command utils */
@@ -277,109 +189,6 @@ const restoreCube = () => {
     }
 };
 
-/** Motor */
-const triggerCurrentMotor = () => {
-    setArduinoDigitalPin(motorA.currentMotorDirectionPin, $.currentMotorDirection);
-    repeat($.currentMotorSteps, () => { // TODO: Change to broadcasting to improve speed
-        setArduinoDigitalPin($.turnStepperPin, 0);
-        setArduinoDigitalPin($.turnStepperPin, 1);
-    });
-};
-
-const turnCurrentMotorClockwise = () => {
-    triggerCurrentMotor();
-};
-
-const turnCurrentMotorCounterclockwise = () => {
-    $.currentMotorDirection = 0;
-    triggerCurrentMotor();
-};
-
-/** Motor A */
-/* TODO: setup() */
-const motorA = {
-    turnDirectionPin: 2,
-    turnStepperPin: 3,
-    holdReleaseDirectionPin: 4,
-    holdReleaseStepperPin: 5,
-};
-const turnMotorAClockwise = () => {
-    $.currentMotorDirectionPin = motorA.turnDirectionPin;
-    $.currentMotorStepperPin = motorA.turnStepperPin;
-    $.currentMotorSteps = 100;
-    turnCurrentMotorClockwise();
-};
-const turnMotorACounterclockwise = () => {
-    $.currentMotorDirectionPin = motorA.turnDirectionPin;
-    $.currentMotorStepperPin = motorA.turnStepperPin;
-    $.currentMotorSteps = 100;
-    turnCurrentMotorCounterclockwise();
-};
-const holdMotorA = () => {
-    $.currentMotorDirectionPin = motorA.holdReleaseDirectionPin;
-    $.currentMotorStepperPin = motorA.holdReleaseStepperPin;
-    $.currentMotorSteps = 50;
-    turnCurrentMotorClockwise();
-};
-const releaseMotorA = () => {
-    $.currentMotorDirectionPin = motorA.holdReleaseDirectionPin;
-    $.currentMotorStepperPin = motorA.holdReleaseStepperPin;
-    $.currentMotorSteps = 50;
-    turnCurrentMotorCounterclockwise();
-};
-
-/** Motor B */
-/* TODO: setup() */
-const motorB = {
-    turnDirectionPin: 6,
-    turnStepperPin: 7,
-    holdReleaseDirectionPin: 8,
-    holdReleaseStepperPin: 9,
-};
-const turnMotorBClockwise = () => {
-    $.currentMotorDirectionPin = motorB.turnDirectionPin;
-    $.currentMotorStepperPin = motorB.turnStepperPin;
-    $.currentMotorSteps = 100;
-    turnCurrentMotorClockwise();
-};
-const turnMotorBCounterclockwise = () => {
-    $.currentMotorDirectionPin = motorB.turnDirectionPin;
-    $.currentMotorStepperPin = motorB.turnStepperPin;
-    $.currentMotorSteps = 100;
-    turnCurrentMotorCounterclockwise();
-};
-const holdMotorB = () => {
-    $.currentMotorDirectionPin = motorB.holdReleaseDirectionPin;
-    $.currentMotorStepperPin = motorB.holdReleaseStepperPin;
-    $.currentMotorSteps = 50;
-    turnCurrentMotorClockwise();
-};
-const releaseMotorB = () => {
-    $.currentMotorDirectionPin = motorB.holdReleaseDirectionPin;
-    $.currentMotorStepperPin = motorB.holdReleaseStepperPin;
-    $.currentMotorSteps = 50;
-    turnCurrentMotorCounterclockwise();
-};
-
-/** Motor C */
-/* TODO: setup() */
-const motorC = {
-    directionPin: 10,
-    stepperPin: 11,
-};
-const turnColorReaderToCube = () => {
-    $.currentMotorDirectionPin = motorC.directionPin;
-    $.currentMotorStepperPin = motorC.stepperPin;
-    $.currentMotorSteps = 100;
-    turnCurrentMotorClockwise();
-};
-const turnColorReaderAwayFromCube = () => {
-    $.currentMotorDirectionPin = motorC.directionPin;
-    $.currentMotorStepperPin = motorC.stepperPin;
-    $.currentMotorSteps = 100;
-    turnCurrentMotorCounterclockwise();
-};
-
 /** Main logic */
 const setup = () => {
     for (let i = 1; i <= 9; i++) {
@@ -403,12 +212,6 @@ const setup = () => {
 };
 const main = () => {
     setup();
-    {
-        // TODO: Only for Javascript testing. Remove block on Catrobat.
-        console.log(`Shuffle cube`);
-        shuffle($, [TA, TAP, TB, TBP, TAHB, TAPHB, TBHA, TBPHA]);
-        logCube($);
-    }
     readCubeColors();
     makeDaisy();
     finishWhiteCross();
@@ -424,32 +227,9 @@ const main = () => {
 
 /** Step: Read cube colors */
 const readCubeColors = () => {
-    return; // TODO: Only for Javascript testing. Remove line on Catrobat.
-
-    const cubeIndex = createList([1, 2, 3, 6, 9, 8, 7, 4]);
-    repeat(2, () => {
-        repeat(4, () => {
-            for (let i = 1; i <= 4; i++) {
-                turnColorReaderToCube();
-
-                readCubeColor($.currentReadPin = 0);
-                $.F[cubeIndex[(i - 1) * 2 + 1]] = $.currentReadColor;
-                readCubeColor($.currentReadPin = 1);
-                $.F[cubeIndex[(i - 1) * 2 + 2]] = $.currentReadColor;
-                readCubeColor($.currentReadPin = 2);
-                $.F[5] = $.currentReadColor;
-
-                turnColorReaderAwayFromCube();
-                TA();
-            }
-            TB();
-        });
-        TA();
-    });
-};
-const readCubeColor = () => {
-    // TODO: Replace dummy code with real implementation
-    $.currentReadColor = getArduinoAnalogPin($.currentReadPin);
+    // TODO: Only for Javascript testing. Implement block for Catrobat.
+    shuffle($, [TA, TAP, TB, TBP, TAHB, TAPHB, TBHA, TBPHA]);
+    logCube($);
 };
 
 /** Step: Make daisy */

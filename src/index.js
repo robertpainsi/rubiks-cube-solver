@@ -343,11 +343,11 @@ const righty = () => {
     R_ccw();
     F_ccw();
 };
-const lefty = () => {
-    L_ccw();
-    F_cw();
-    L_cw();
+const reverse_righty = () => {
+    R_cw();
     F_ccw();
+    R_ccw();
+    F_cw();
 };
 
 /** Data utils */
@@ -597,45 +597,61 @@ const finishSecondLayer = () => {
         console.log(`Finish second layer colors`, colorizeBlock(c1), colorizeBlock(c2));
         logCube($);
 
-        repeat(4, () => {
-            if (($.R[8] === c1 || $.R[8] === c2) && ($.D[6] === c1 || $.D[6] === c2)) {
-                righty();
-                righty();
-                F_cw();
-                righty();
-                righty();
-                righty();
-                righty();
-            } else {
-                MotorF_cw();
-            }
-        });
+        if (
+            ($.R[8] === c1 || $.R[8] === c2) && ($.D[6] === c1 || $.D[6] === c2) ||
+            ($.R[2] === c1 || $.R[2] === c2) && ($.U[6] === c1 || $.U[6] === c2) ||
+            ($.L[8] === c1 || $.L[8] === c2) && ($.D[4] === c1 || $.D[4] === c2) ||
+            ($.L[2] === c1 || $.L[2] === c2) && ($.U[4] === c1 || $.U[4] === c2)
+        ) {
+            repeat(4, () => {
+                if (($.R[8] === c1 || $.R[8] === c2) && ($.D[6] === c1 || $.D[6] === c2)) {
+                    righty();
+                    righty();
+                    F_cw();
+                    F_cw();
+                    reverse_righty();
+                    reverse_righty();
+                } else {
+                    MotorF_cw();
+                }
+            });
+        }
 
         while (!(($.F[8] === c1 || $.F[8] === c2) && ($.D[2] === c1 || $.D[2] === c2))) {
             F_cw();
         }
-        while ($.F[8] !== $.D[5]) {
+        while ($.D[2] !== $.D[5]) {
             MotorF_cw();
             F_ccw();
         }
         if ($.R[5] === c1 || $.R[5] === c2) {
+            // U R U' R'
             F_cw();
-            righty();
-            righty();
-            F_cw();
-            righty();
-            righty();
-            righty();
-            righty();
-        } else if ($.L[5] === c1 || $.L[5] === c2) {
+            R_cw();
             F_ccw();
-            lefty();
-            lefty();
+            R_ccw();
+
+            // U' F' U F
+            MotorF_ccw();
+            F_ccw();
+            R_ccw();
             F_cw();
-            lefty();
-            lefty();
-            lefty();
-            lefty();
+            R_cw();
+            MotorF_cw();
+        } else if ($.L[5] === c1 || $.L[5] === c2) {
+            // U' L' U L
+            F_ccw();
+            L_ccw();
+            F_cw();
+            L_cw();
+
+            // U F U' F'
+            MotorF_ccw();
+            F_cw();
+            R_cw();
+            F_ccw();
+            R_ccw();
+            MotorF_cw();
         }
 
         assert.ts($);

@@ -508,18 +508,38 @@ const finishWhiteFace = () => {
         logCube($);
 
         console.log(`Move away from white face`);
-        repeat(4, () => {
-            if (
+        if (
+            (
                 ($.D[9] === `w` || $.B[7] === `w` || $.R[9] === `w`) &&
                 ($.D[9] === c1 || $.B[7] === c1 || $.R[9] === c1) &&
                 ($.D[9] === c2 || $.B[7] === c2 || $.R[9] === c2)
-            ) {
-                righty();
-            } else {
-                MotorF_cw();
-            }
-        });
-        logCube($);
+            ) || (
+                ($.U[3] === `w` || $.B[1] === `w` || $.R[3] === `w`) &&
+                ($.U[3] === c1 || $.B[1] === c1 || $.R[3] === c1) &&
+                ($.U[3] === c2 || $.B[1] === c2 || $.R[3] === c2)
+            ) || (
+                ($.D[7] === `w` || $.B[9] === `w` || $.L[7] === `w`) &&
+                ($.D[7] === c1 || $.B[9] === c1 || $.L[7] === c1) &&
+                ($.D[7] === c2 || $.B[9] === c2 || $.L[7] === c2)
+            ) || (
+                ($.U[1] === `w` || $.B[3] === `w` || $.L[1] === `w`) &&
+                ($.U[1] === c1 || $.B[3] === c1 || $.L[1] === c1) &&
+                ($.U[1] === c2 || $.B[3] === c2 || $.L[1] === c2)
+            )
+        ) {
+            repeat(4, () => {
+                if (
+                    ($.D[9] === `w` || $.B[7] === `w` || $.R[9] === `w`) &&
+                    ($.D[9] === c1 || $.B[7] === c1 || $.R[9] === c1) &&
+                    ($.D[9] === c2 || $.B[7] === c2 || $.R[9] === c2)
+                ) {
+                    righty();
+                } else {
+                    MotorF_cw();
+                }
+            });
+            logCube($);
+        }
 
         console.log('Colored corner on correct faces, F,U,R = F,R,`w`');
         while ($.R[5] !== c1) {
@@ -537,8 +557,25 @@ const finishWhiteFace = () => {
         logCube($);
 
         console.log('Fix white corner');
-        while ($.B[7] !== `w` || $.R[9] !== $.R[5] || $.D[9] !== $.D[5]) {
-            righty();
+        if ($.D[3] === `w`) {
+            F_cw();
+            R_cw();
+            F_ccw();
+            R_ccw();
+        } else if ($.R[7] === `w`) {
+            R_cw();
+            F_cw();
+            R_ccw();
+        } else {
+            F_cw();
+            R_cw();
+            F_ccw();
+            F_ccw();
+            R_ccw();
+            F_cw();
+            R_cw();
+            F_ccw();
+            R_ccw();
         }
         logCube($);
 

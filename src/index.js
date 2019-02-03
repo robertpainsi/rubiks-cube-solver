@@ -4,6 +4,30 @@ import {createList, repeat} from "./pocket-code";
 import {colorizeBlock, logCube, shuffle} from "./utils";
 import assert from "./assert";
 
+const debug = {
+    operations: {
+        makeDaisy: 0,
+        finishWhiteCross: 0,
+        finishWhiteFace: 0,
+        finishSecondLayer: 0,
+        finishYellowCross: 0,
+        finishYellowEdges: 0,
+        orientYellowCorners: 0,
+        moveYellowCornersToTheirPlaces: 0,
+        total: 0,
+    },
+    currentOperation: '',
+};
+
+const FORWARD_TIME = 3;
+const BACKWARD_TIME = 5;
+const ROTATE_TIME = 7;
+
+const MOTOR_TIME = 1;
+// const MOTOR_TIME = 3 * FORWARD_TIME + 3 * BACKWARD_TIME + 3 * ROTATE_TIME;
+const FACE_TIME = 1;
+// const FACE_TIME = 1 * FORWARD_TIME + 1 * BACKWARD_TIME + 2 * ROTATE_TIME;
+
 /** Program variables/lists */
 const $ = {
     F: createList(),
@@ -26,8 +50,11 @@ const $ = {
 };
 
 /** Command handler */
-const MotorF_cw = (foo) => {
-    if (!foo) console.log(`MotorF_cw`);
+const MotorF_cw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`MotorF_cw`);
+        debug.operations[debug.currentOperation] += MOTOR_TIME;
+    }
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
@@ -45,24 +72,36 @@ const MotorF_cw = (foo) => {
     }
     restoreCube();
 };
-const MotorF_ccw = (foo) => {
-    if (!foo) console.log(`MotorF_ccw`);
+const MotorF_ccw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`MotorF_ccw`);
+        debug.operations[debug.currentOperation] += MOTOR_TIME;
+    }
     MotorF_cw(true);
     MotorF_cw(true);
     MotorF_cw(true);
 };
 
-const MotorB_cw = (foo) => {
-    if (!foo) console.log(`MotorB_cw`);
+const MotorB_cw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`MotorB_cw`);
+        debug.operations[debug.currentOperation] += MOTOR_TIME;
+    }
     MotorF_ccw(true);
 };
-const MotorB_ccw = (foo) => {
-    if (!foo) console.log(`MotorB_ccw`);
+const MotorB_ccw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`MotorB_ccw`);
+        debug.operations[debug.currentOperation] += MOTOR_TIME;
+    }
     MotorF_cw(true);
 };
 
-const MotorR_cw = (foo) => {
-    if (!foo) console.log(`MotorR_cw`);
+const MotorR_cw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`MotorR_cw`);
+        debug.operations[debug.currentOperation] += MOTOR_TIME;
+    }
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
@@ -80,24 +119,36 @@ const MotorR_cw = (foo) => {
     }
     restoreCube();
 };
-const MotorR_ccw = (foo) => {
-    if (!foo) console.log(`MotorR_ccw`);
+const MotorR_ccw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`MotorR_ccw`);
+        debug.operations[debug.currentOperation] += MOTOR_TIME;
+    }
     MotorR_cw(true);
     MotorR_cw(true);
     MotorR_cw(true);
 };
 
-const MotorL_cw = (foo) => {
-    if (!foo) console.log(`MotorL_cw`);
+const MotorL_cw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`MotorL_cw`);
+        debug.operations[debug.currentOperation] += MOTOR_TIME;
+    }
     MotorR_ccw(true);
 };
-const MotorL_ccw = (foo) => {
-    if (!foo) console.log(`MotorL_ccw`);
+const MotorL_ccw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`MotorL_ccw`);
+        debug.operations[debug.currentOperation] += MOTOR_TIME;
+    }
     MotorR_cw(true);
 };
 
-const F_cw = (foo) => {
-    if (!foo) console.log(`F_cw`);
+const F_cw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`F_cw`);
+        debug.operations[debug.currentOperation] += FACE_TIME;
+    }
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
@@ -125,15 +176,21 @@ const F_cw = (foo) => {
     $.DB[3] = $.R[1];
     restoreCube();
 };
-const F_ccw = (foo) => {
-    if (!foo) console.log(`F_ccw`);
+const F_ccw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`F_ccw`);
+        debug.operations[debug.currentOperation] += FACE_TIME;
+    }
     F_cw(true);
     F_cw(true);
     F_cw(true);
 };
 
-const B_cw = (foo) => {
-    if (!foo) console.log(`B_cw`);
+const B_cw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`B_cw`);
+        debug.operations[debug.currentOperation] += FACE_TIME;
+    }
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
@@ -161,15 +218,21 @@ const B_cw = (foo) => {
     $.DB[9] = $.L[7];
     restoreCube();
 };
-const B_ccw = (foo) => {
-    if (!foo) console.log(`B_ccw`);
+const B_ccw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`B_ccw`);
+        debug.operations[debug.currentOperation] += FACE_TIME;
+    }
     B_cw(true);
     B_cw(true);
     B_cw(true);
 };
 
-const R_cw = (foo) => {
-    if (!foo) console.log(`R_cw`);
+const R_cw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`R_cw`);
+        debug.operations[debug.currentOperation] += FACE_TIME;
+    }
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
@@ -197,15 +260,21 @@ const R_cw = (foo) => {
     $.DB[9] = $.B[1];
     restoreCube();
 };
-const R_ccw = (foo) => {
-    if (!foo) console.log(`R_ccw`);
+const R_ccw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`R_ccw`);
+        debug.operations[debug.currentOperation] += FACE_TIME;
+    }
     R_cw(true);
     R_cw(true);
     R_cw(true);
 };
 
-const L_cw = (foo) => {
-    if (!foo) console.log(`L_cw`);
+const L_cw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`L_cw`);
+        debug.operations[debug.currentOperation] += FACE_TIME;
+    }
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
@@ -233,8 +302,11 @@ const L_cw = (foo) => {
     $.DB[7] = $.F[7];
     restoreCube();
 };
-const L_ccw = (foo) => {
-    if (!foo) console.log(`L_ccw`);
+const L_ccw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`L_ccw`);
+        debug.operations[debug.currentOperation] += FACE_TIME;
+    }
     L_cw(true);
     L_cw(true);
     L_cw(true);
@@ -303,7 +375,8 @@ const restoreCube = () => {
 
 /** Main logic */
 const main = () => {
-    for (let run = 1; run <= 1; run++) {
+    const RUNS = 1000;
+    for (let run = 1; run <= RUNS; run++) {
         console.log(`RUN #${run} ------------------------------------------------------------------------------------`);
         setup();
         readCubeColors();
@@ -318,6 +391,17 @@ const main = () => {
         orientYellowCorners();
 
         assert.cube($);
+    }
+
+    for (let [key, value] of Object.entries(debug.operations)) {
+        if (key === `total`) {
+            continue;
+        }
+        debug.operations.total += value;
+    }
+
+    for (let [key, value] of Object.entries(debug.operations)) {
+        console.log(`${(value / RUNS)} operations for ${key}`);
     }
 };
 
@@ -358,6 +442,7 @@ const readCubeColors = () => {
 
 /** Step: Make daisy */
 const makeDaisy = () => {
+    debug.currentOperation = `makeDaisy`;
     console.log(`Make daisy`);
     moveFaceToF($.moveFaceToFColor = `y`);
     while ($.F[2] !== `w` || $.F[4] !== `w` || $.F[6] !== `w` || $.F[8] !== `w`) {
@@ -388,6 +473,7 @@ const makeDaisy = () => {
 
 /** Step: Finish white cross */
 const finishWhiteCross = () => {
+    debug.currentOperation = `finishWhiteCross`;
     console.log(`Finish white cross`);
     while ($.F[2] === `w` || $.F[4] === `w` || $.F[6] === `w` || $.F[8] === `w`) {
         logCube($);
@@ -412,6 +498,7 @@ const finishWhiteCross = () => {
 
 /** Step: Finish white face */
 const finishWhiteFace = () => {
+    debug.currentOperation = `finishWhiteFace`;
     console.log(`Finish white face`);
     for (let i = 1; i <= 4; i++) {
         const c1 = $.horizontalEdges[(i - 1) * 2 + 1];
@@ -463,7 +550,9 @@ const finishWhiteFace = () => {
 
 /** Step: Finish second layer */
 const finishSecondLayer = () => {
-    console.log(`Finish second layer`); // TODO: Add comments and cube logs
+
+    debug.currentOperation = `finishSecondLayer`;
+    console.log(`Finish second layer`);
     for (let i = 1; i <= 4; i++) {
         const c1 = $.horizontalEdges[(i - 1) * 2 + 1];
         const c2 = $.horizontalEdges[(i - 1) * 2 + 2];
@@ -521,6 +610,7 @@ const finishSecondLayer = () => {
 
 /** Step: Finish yellow cross */
 const finishYellowCross = () => {
+    debug.currentOperation = `finishYellowCross`;
     console.log(`Finish yellow cross`);
     while (
         $.F[2] !== `y`
@@ -553,6 +643,7 @@ const finishYellowCross = () => {
 
 /** Step: Finish yellow edges */
 const finishYellowEdges = () => {
+    debug.currentOperation = `finishYellowEdges`;
     console.log(`Finish yellow edges`);
     while (!($.U[8] === $.U[5] && $.R[4] === $.R[5] && $.D[2] === $.D[5] && $.L[6] === $.L[5])) {
         if ($.D[2] !== $.D[5]) {
@@ -585,6 +676,7 @@ const finishYellowEdges = () => {
 
 /** Step: Move yellow corners to their places */
 const moveYellowCornersToTheirPlaces = () => {
+    debug.currentOperation = `moveYellowCornersToTheirPlaces`;
     console.log(`Move corners to their places`);
     repeat(3, () => {
         repeat(4, () => {
@@ -622,6 +714,7 @@ const moveYellowCornersToTheirPlaces = () => {
 
 /** Step: Orient yellow corners */
 const orientYellowCorners = () => {
+    debug.currentOperation = `orientYellowCorners`;
     console.log(`Orient yellow corners`);
     while (!($.F[1] === `y` && $.F[3] === `y` && $.F[7] === `y` && $.F[9] === `y`)) {
         console.log(`Orient yellow corner`);

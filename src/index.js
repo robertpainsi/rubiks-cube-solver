@@ -45,6 +45,7 @@ const $ = {
     DB: createList(),
 
     horizontalEdges: createList(),
+    permutation: createList(),
 
     moveFaceToFColor: 0,
 };
@@ -337,19 +338,6 @@ const moveFaceToF = () => {
     });
 };
 
-const righty = () => {
-    R_cw();
-    F_cw();
-    R_ccw();
-    F_ccw();
-};
-const reverse_righty = () => {
-    R_cw();
-    F_ccw();
-    R_ccw();
-    F_cw();
-};
-
 /** Data utils */
 const backupCube = () => {
     for (let i = 1; i <= 9; i++) {
@@ -371,6 +359,27 @@ const restoreCube = () => {
         $.U[i] = $.UB[i];
         $.D[i] = $.DB[i];
     }
+};
+
+const clearPermutation = () => {
+  while ($.permutation.length) {
+    delete $.permutation[1];
+  }
+};
+
+const createPermutation = () => {
+  const n = $.permutation.length;
+  for (let i = 1; i <= n; i++) {
+    if ($.permutation[i].length === 2) {
+      $.permutation.push($.permutation[i][1] + $.permutation[i][0]);
+    } else if ($.permutation[i].length === 3) {
+      $.permutation.push($.permutation[i][0] + $.permutation[i][2] + $.permutation[i][1]);
+      $.permutation.push($.permutation[i][1] + $.permutation[i][0] + $.permutation[i][2]);
+      $.permutation.push($.permutation[i][1] + $.permutation[i][2] + $.permutation[i][0]);
+      $.permutation.push($.permutation[i][2] + $.permutation[i][0] + $.permutation[i][1]);
+      $.permutation.push($.permutation[i][2] + $.permutation[i][1] + $.permutation[i][0]);
+    }
+  }
 };
 
 /** Main logic */
@@ -503,42 +512,29 @@ const finishWhiteFace = () => {
     for (let i = 1; i <= 4; i++) {
         const c1 = $.horizontalEdges[(i - 1) * 2 + 1];
         const c2 = $.horizontalEdges[(i - 1) * 2 + 2];
+        clearPermutation();
+        $.permutation.push(`w` + c1 + c2);
+        createPermutation();
 
         console.log(`Finish white corners`, colorizeBlock(c1), colorizeBlock(c2));
         logCube($);
 
         console.log(`Move away from white face`);
         if (
-            (
-                ($.D[9] === `w` || $.B[7] === `w` || $.R[9] === `w`) &&
-                ($.D[9] === c1 || $.B[7] === c1 || $.R[9] === c1) &&
-                ($.D[9] === c2 || $.B[7] === c2 || $.R[9] === c2)
-            ) || (
-                ($.U[3] === `w` || $.B[1] === `w` || $.R[3] === `w`) &&
-                ($.U[3] === c1 || $.B[1] === c1 || $.R[3] === c1) &&
-                ($.U[3] === c2 || $.B[1] === c2 || $.R[3] === c2)
-            ) || (
-                ($.D[7] === `w` || $.B[9] === `w` || $.L[7] === `w`) &&
-                ($.D[7] === c1 || $.B[9] === c1 || $.L[7] === c1) &&
-                ($.D[7] === c2 || $.B[9] === c2 || $.L[7] === c2)
-            ) || (
-                ($.U[1] === `w` || $.B[3] === `w` || $.L[1] === `w`) &&
-                ($.U[1] === c1 || $.B[3] === c1 || $.L[1] === c1) &&
-                ($.U[1] === c2 || $.B[3] === c2 || $.L[1] === c2)
-            )
+            $.permutation.contains($.B[7] + $.R[9] + $.D[9]) ||
+            $.permutation.contains($.B[1] + $.R[3] + $.U[3]) ||
+            $.permutation.contains($.B[9] + $.L[7] + $.D[7]) ||
+            $.permutation.contains($.B[3] + $.L[1] + $.U[1])
         ) {
-            repeat(4, () => {
-                if (
-                    ($.D[9] === `w` || $.B[7] === `w` || $.R[9] === `w`) &&
-                    ($.D[9] === c1 || $.B[7] === c1 || $.R[9] === c1) &&
-                    ($.D[9] === c2 || $.B[7] === c2 || $.R[9] === c2)
-                ) {
-                    righty();
-                } else {
-                    MotorF_cw();
-                }
-            });
-            logCube($);
+          repeat(4, () => {
+              if ($.permutation.contains($.B[7] + $.R[9] + $.D[9])) {
+                  R_cw();
+                  F_cw();
+                  R_ccw();
+              } else {
+                  MotorF_cw();
+              }
+          })
         }
 
         console.log('Colored corner on correct faces, F,U,R = F,R,`w`');
@@ -546,11 +542,7 @@ const finishWhiteFace = () => {
             MotorF_cw();
         }
         logCube($);
-        while (!(
-            ($.F[9] === `w` || $.D[3] === `w` || $.R[7] === `w`) &&
-            ($.F[9] === c1 || $.D[3] === c1 || $.R[7] === c1) &&
-            ($.F[9] === c2 || $.D[3] === c2 || $.R[7] === c2)
-        )) {
+        while (!$.permutation.contains($.F[9] + $.D[3] + $.R[7])) {
             F_cw();
             logCube($);
         }
@@ -587,43 +579,62 @@ const finishWhiteFace = () => {
 
 /** Step: Finish second layer */
 const finishSecondLayer = () => {
-
     debug.currentOperation = `finishSecondLayer`;
     console.log(`Finish second layer`);
     for (let i = 1; i <= 4; i++) {
         const c1 = $.horizontalEdges[(i - 1) * 2 + 1];
         const c2 = $.horizontalEdges[(i - 1) * 2 + 2];
+        clearPermutation();
+        $.permutation.push(c1 + c2);
+        createPermutation();
 
         console.log(`Finish second layer colors`, colorizeBlock(c1), colorizeBlock(c2));
         logCube($);
 
         if (
-            ($.R[8] === c1 || $.R[8] === c2) && ($.D[6] === c1 || $.D[6] === c2) ||
-            ($.R[2] === c1 || $.R[2] === c2) && ($.U[6] === c1 || $.U[6] === c2) ||
-            ($.L[8] === c1 || $.L[8] === c2) && ($.D[4] === c1 || $.D[4] === c2) ||
-            ($.L[2] === c1 || $.L[2] === c2) && ($.U[4] === c1 || $.U[4] === c2)
+            $.permutation.contains($.R[8] + $.D[6]) ||
+            $.permutation.contains($.R[2] + $.U[6]) ||
+            $.permutation.contains($.L[8] + $.D[4]) ||
+            $.permutation.contains($.L[2] + $.U[4])
         ) {
             repeat(4, () => {
-                if (($.R[8] === c1 || $.R[8] === c2) && ($.D[6] === c1 || $.D[6] === c2)) {
-                    righty();
-                    righty();
+                if ($.permutation.contains($.R[8] + $.D[6])) {
+                    R_cw();
+                    F_cw();
+                    R_ccw();
+                    F_ccw();
+
+                    R_cw();
+                    F_cw();
+                    R_ccw();
+                    F_ccw();
+
                     F_cw();
                     F_cw();
-                    reverse_righty();
-                    reverse_righty();
+
+                    R_cw();
+                    F_ccw();
+                    R_ccw();
+                    F_cw();
+
+                    R_cw();
+                    F_ccw();
+                    R_ccw();
+                    F_cw();
                 } else {
                     MotorF_cw();
                 }
             });
         }
 
-        while (!(($.F[8] === c1 || $.F[8] === c2) && ($.D[2] === c1 || $.D[2] === c2))) {
+        while (!$.permutation.contains($.F[8] + $.D[2])) {
             F_cw();
         }
         while ($.D[2] !== $.D[5]) {
             MotorF_cw();
             F_ccw();
         }
+
         if ($.R[5] === c1 || $.R[5] === c2) {
             // U R U' R'
             F_cw();
@@ -682,7 +693,10 @@ const finishYellowCross = () => {
         MotorR_cw();
         F_cw();
         MotorR_ccw();
-        righty();
+        R_cw();
+        F_cw();
+        R_ccw();
+        F_ccw();
         MotorR_cw();
         F_ccw();
         MotorR_ccw();
@@ -701,16 +715,16 @@ const finishYellowEdges = () => {
     while (!($.U[8] === $.U[5] && $.R[4] === $.R[5] && $.D[2] === $.D[5] && $.L[6] === $.L[5])) {
         if ($.D[2] !== $.D[5]) {
             console.log(`Swap edges`);
+            // R U R' U
             R_cw();
             F_cw();
-
             R_ccw();
             F_cw();
 
+            // R U2 R' U
             R_cw();
             F_cw();
             F_cw();
-
             R_ccw();
             F_cw();
 

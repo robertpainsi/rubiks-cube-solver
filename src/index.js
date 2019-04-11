@@ -16,15 +16,15 @@ const debug = {
         orientYellowCorners: 0,
         total: 0,
     },
-    currentOperation: '',
+    currentOperation: ``,
 };
 
 const FORWARD_TIME = 3;
 const BACKWARD_TIME = 5;
 const ROTATE_TIME = 7;
 
-const MOTOR_TIME = 1;
-// const MOTOR_TIME = 3 * FORWARD_TIME + 3 * BACKWARD_TIME + 3 * ROTATE_TIME;
+const CUBE_TIME = 1;
+// const CUBE_TIME = 3 * FORWARD_TIME + 3 * BACKWARD_TIME + 3 * ROTATE_TIME;
 const FACE_TIME = 1;
 // const FACE_TIME = 1 * FORWARD_TIME + 1 * BACKWARD_TIME + 2 * ROTATE_TIME;
 
@@ -45,16 +45,22 @@ const $ = {
     DB: createList(),
 
     horizontalEdges: createList(),
-    permutation: createList(),
 
     moveFaceToFColor: 0,
 };
 
-/** Command handler */
+const W = 1;
+const Y = 10;
+const O = 100;
+const R = 1000;
+const G = 10000;
+const B = 100000;
+
+/** Motor commands handler */
 const MotorF_cw = (alreadyLogged) => {
     if (!alreadyLogged) {
         console.log(`MotorF_cw`);
-        debug.operations[debug.currentOperation] += MOTOR_TIME;
+        debug.operations[debug.currentOperation] += CUBE_TIME;
     }
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
@@ -76,7 +82,7 @@ const MotorF_cw = (alreadyLogged) => {
 const MotorF_ccw = (alreadyLogged) => {
     if (!alreadyLogged) {
         console.log(`MotorF_ccw`);
-        debug.operations[debug.currentOperation] += MOTOR_TIME;
+        debug.operations[debug.currentOperation] += CUBE_TIME;
     }
     MotorF_cw(true);
     MotorF_cw(true);
@@ -86,14 +92,14 @@ const MotorF_ccw = (alreadyLogged) => {
 const MotorB_cw = (alreadyLogged) => {
     if (!alreadyLogged) {
         console.log(`MotorB_cw`);
-        debug.operations[debug.currentOperation] += MOTOR_TIME;
+        debug.operations[debug.currentOperation] += CUBE_TIME;
     }
     MotorF_ccw(true);
 };
 const MotorB_ccw = (alreadyLogged) => {
     if (!alreadyLogged) {
         console.log(`MotorB_ccw`);
-        debug.operations[debug.currentOperation] += MOTOR_TIME;
+        debug.operations[debug.currentOperation] += CUBE_TIME;
     }
     MotorF_cw(true);
 };
@@ -101,7 +107,7 @@ const MotorB_ccw = (alreadyLogged) => {
 const MotorR_cw = (alreadyLogged) => {
     if (!alreadyLogged) {
         console.log(`MotorR_cw`);
-        debug.operations[debug.currentOperation] += MOTOR_TIME;
+        debug.operations[debug.currentOperation] += CUBE_TIME;
     }
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
@@ -123,7 +129,7 @@ const MotorR_cw = (alreadyLogged) => {
 const MotorR_ccw = (alreadyLogged) => {
     if (!alreadyLogged) {
         console.log(`MotorR_ccw`);
-        debug.operations[debug.currentOperation] += MOTOR_TIME;
+        debug.operations[debug.currentOperation] += CUBE_TIME;
     }
     MotorR_cw(true);
     MotorR_cw(true);
@@ -133,14 +139,14 @@ const MotorR_ccw = (alreadyLogged) => {
 const MotorL_cw = (alreadyLogged) => {
     if (!alreadyLogged) {
         console.log(`MotorL_cw`);
-        debug.operations[debug.currentOperation] += MOTOR_TIME;
+        debug.operations[debug.currentOperation] += CUBE_TIME;
     }
     MotorR_ccw(true);
 };
 const MotorL_ccw = (alreadyLogged) => {
     if (!alreadyLogged) {
         console.log(`MotorL_ccw`);
-        debug.operations[debug.currentOperation] += MOTOR_TIME;
+        debug.operations[debug.currentOperation] += CUBE_TIME;
     }
     MotorR_cw(true);
 };
@@ -313,7 +319,7 @@ const L_ccw = (alreadyLogged) => {
     L_cw(true);
 };
 
-/** Command utils */
+/** Motor command utils */
 const moveFaceToF = () => {
     if ($.F[5] === $.moveFaceToFColor) {
         return;
@@ -361,35 +367,13 @@ const restoreCube = () => {
     }
 };
 
-const clearPermutation = () => {
-  while ($.permutation.length) {
-    delete $.permutation[1];
-  }
-};
-
-const createPermutation = () => {
-  const n = $.permutation.length;
-  for (let i = 1; i <= n; i++) {
-    if ($.permutation[i].length === 2) {
-      $.permutation.push($.permutation[i][1] + $.permutation[i][0]);
-    } else if ($.permutation[i].length === 3) {
-      $.permutation.push($.permutation[i][0] + $.permutation[i][2] + $.permutation[i][1]);
-      $.permutation.push($.permutation[i][1] + $.permutation[i][0] + $.permutation[i][2]);
-      $.permutation.push($.permutation[i][1] + $.permutation[i][2] + $.permutation[i][0]);
-      $.permutation.push($.permutation[i][2] + $.permutation[i][0] + $.permutation[i][1]);
-      $.permutation.push($.permutation[i][2] + $.permutation[i][1] + $.permutation[i][0]);
-    }
-  }
-};
-
 /** Main logic */
 const main = () => {
-    const RUNS = 1000;
+    const RUNS = 1;
     for (let run = 1; run <= RUNS; run++) {
         console.log(`RUN #${run} ------------------------------------------------------------------------------------`);
         setup();
         readCubeColors();
-        logCube($);
         makeDaisy();
         finishWhiteCross();
         finishWhiteFace();
@@ -417,28 +401,35 @@ const main = () => {
 /** Step: Setup */
 const setup = () => {
     for (let i = 1; i <= 9; i++) {
-        $.F[i] = `w`;
-        $.B[i] = `y`;
-        $.L[i] = `b`;
-        $.R[i] = `g`;
-        $.U[i] = `r`;
-        $.D[i] = `o`;
+        $.F[i] = W;
+        $.B[i] = Y;
+        $.L[i] = B;
+        $.R[i] = G;
+        $.U[i] = R;
+        $.D[i] = O;
+
+        $.FB[i] = $.F[i];
+        $.BB[i] = $.B[i];
+        $.LB[i] = $.L[i];
+        $.RB[i] = $.R[i];
+        $.UB[i] = $.U[i];
+        $.DB[i] = $.D[i];
     }
     backupCube();
 
-    $.horizontalEdges.push(`b`);
-    $.horizontalEdges.push(`o`);
-    $.horizontalEdges.push(`o`);
-    $.horizontalEdges.push(`g`);
-    $.horizontalEdges.push(`g`);
-    $.horizontalEdges.push(`r`);
-    $.horizontalEdges.push(`r`);
-    $.horizontalEdges.push(`b`);
+    $.horizontalEdges.push(B);
+    $.horizontalEdges.push(O);
+    $.horizontalEdges.push(O);
+    $.horizontalEdges.push(G);
+    $.horizontalEdges.push(G);
+    $.horizontalEdges.push(R);
+    $.horizontalEdges.push(R);
+    $.horizontalEdges.push(B);
 };
 
 /** Step: Read cube colors */
 const readCubeColors = () => {
-    // TODO: Only for Javascript testing. Remove block on Catrobat.
+    // TODO: Only for Javascript testing. Remove in Pocket Code.
     console.log(`Shuffle cube`);
     shuffle($, [
         F_cw, F_ccw, MotorF_cw, MotorF_ccw,
@@ -453,21 +444,21 @@ const readCubeColors = () => {
 const makeDaisy = () => {
     debug.currentOperation = `makeDaisy`;
     console.log(`Make daisy`);
-    moveFaceToF($.moveFaceToFColor = `y`);
-    while ($.F[2] !== `w` || $.F[4] !== `w` || $.F[6] !== `w` || $.F[8] !== `w`) {
-        if ($.U[6] === `w` || $.D[6] === `w` || $.B[4] === `w`) {
-            while ($.F[6] === `w`) {
+    moveFaceToF($.moveFaceToFColor = Y);
+    while ($.F[2] !== W || $.F[4] !== W || $.F[6] !== W || $.F[8] !== W) {
+        if ($.U[6] === W || $.D[6] === W || $.B[4] === W) {
+            while ($.F[6] === W) {
                 F_cw();
             }
-            while ($.F[6] !== `w`) {
+            while ($.F[6] !== W) {
                 R_cw();
             }
         }
 
-        if ($.R[4] === `w`) {
+        if ($.R[4] === W) {
             R_cw();
-        } else if ($.R[6] === `w`) {
-            while ($.F[6] === `w`) {
+        } else if ($.R[6] === W) {
+            while ($.F[6] === W) {
                 F_cw();
             }
             R_cw();
@@ -484,15 +475,15 @@ const makeDaisy = () => {
 const finishWhiteCross = () => {
     debug.currentOperation = `finishWhiteCross`;
     console.log(`Finish white cross`);
-    while ($.F[2] === `w` || $.F[4] === `w` || $.F[6] === `w` || $.F[8] === `w`) {
+    while ($.F[2] === W || $.F[4] === W || $.F[6] === W || $.F[8] === W) {
         logCube($);
 
-        while ($.R[5] !== $.R[6] || $.B[4] !== `w`) {
-            if ($.F[6] === `w` && $.R[4] === $.R[5]) {
+        while ($.R[5] !== $.R[6] || $.B[4] !== W) {
+            if ($.F[6] === W && $.R[4] === $.R[5]) {
                 R_cw();
                 R_cw();
             }
-            if ($.F[2] === `w` && $.U[8] === $.R[5]) {
+            if ($.F[2] === W && $.U[8] === $.R[5]) {
                 F_cw();
             } else {
                 F_ccw();
@@ -512,49 +503,47 @@ const finishWhiteFace = () => {
     for (let i = 1; i <= 4; i++) {
         const c1 = $.horizontalEdges[(i - 1) * 2 + 1];
         const c2 = $.horizontalEdges[(i - 1) * 2 + 2];
-        clearPermutation();
-        $.permutation.push(`w` + c1 + c2);
-        createPermutation();
+        const piece = W + c1 + c2;
 
         console.log(`Finish white corners`, colorizeBlock(c1), colorizeBlock(c2));
         logCube($);
 
         console.log(`Move away from white face`);
         if (
-            $.permutation.contains($.B[7] + $.R[9] + $.D[9]) ||
-            $.permutation.contains($.B[1] + $.R[3] + $.U[3]) ||
-            $.permutation.contains($.B[9] + $.L[7] + $.D[7]) ||
-            $.permutation.contains($.B[3] + $.L[1] + $.U[1])
+            piece === $.B[7] + $.R[9] + $.D[9] ||
+            piece === $.B[1] + $.R[3] + $.U[3] ||
+            piece === $.B[9] + $.L[7] + $.D[7] ||
+            piece === $.B[3] + $.L[1] + $.U[1]
         ) {
-          repeat(4, () => {
-              if ($.permutation.contains($.B[7] + $.R[9] + $.D[9])) {
-                  R_cw();
-                  F_cw();
-                  R_ccw();
-              } else {
-                  MotorF_cw();
-              }
-          })
+            repeat(4, () => {
+                if (piece === $.B[7] + $.R[9] + $.D[9]) {
+                    R_cw();
+                    F_cw();
+                    R_ccw();
+                } else {
+                    MotorF_cw();
+                }
+            })
         }
 
-        console.log('Colored corner on correct faces, F,U,R = F,R,`w`');
+        console.log(`Colored corner on correct faces, F,U,R = F,R,w`);
         while ($.R[5] !== c1) {
             MotorF_cw();
         }
         logCube($);
-        while (!$.permutation.contains($.F[9] + $.D[3] + $.R[7])) {
+        while (piece !== $.F[9] + $.D[3] + $.R[7]) {
             F_cw();
             logCube($);
         }
         logCube($);
 
-        console.log('Fix white corner');
-        if ($.D[3] === `w`) {
+        console.log(`Fix white corner`);
+        if ($.D[3] === W) {
             F_cw();
             R_cw();
             F_ccw();
             R_ccw();
-        } else if ($.R[7] === `w`) {
+        } else if ($.R[7] === W) {
             R_cw();
             F_cw();
             R_ccw();
@@ -584,21 +573,19 @@ const finishSecondLayer = () => {
     for (let i = 1; i <= 4; i++) {
         const c1 = $.horizontalEdges[(i - 1) * 2 + 1];
         const c2 = $.horizontalEdges[(i - 1) * 2 + 2];
-        clearPermutation();
-        $.permutation.push(c1 + c2);
-        createPermutation();
+        const piece = c1 + c2;
 
         console.log(`Finish second layer colors`, colorizeBlock(c1), colorizeBlock(c2));
         logCube($);
 
         if (
-            $.permutation.contains($.R[8] + $.D[6]) ||
-            $.permutation.contains($.R[2] + $.U[6]) ||
-            $.permutation.contains($.L[8] + $.D[4]) ||
-            $.permutation.contains($.L[2] + $.U[4])
+            piece === $.R[8] + $.D[6] ||
+            piece === $.R[2] + $.U[6] ||
+            piece === $.L[8] + $.D[4] ||
+            piece === $.L[2] + $.U[4]
         ) {
             repeat(4, () => {
-                if ($.permutation.contains($.R[8] + $.D[6])) {
+                if (piece === $.R[8] + $.D[6]) {
                     R_cw();
                     F_cw();
                     R_ccw();
@@ -627,7 +614,7 @@ const finishSecondLayer = () => {
             });
         }
 
-        while (!$.permutation.contains($.F[8] + $.D[2])) {
+        while (piece !== $.F[8] + $.D[2]) {
             F_cw();
         }
         while ($.D[2] !== $.D[5]) {
@@ -677,16 +664,16 @@ const finishYellowCross = () => {
     debug.currentOperation = `finishYellowCross`;
     console.log(`Finish yellow cross`);
     while (
-        $.F[2] !== `y`
-        || $.F[4] !== `y`
-        || $.F[6] !== `y`
-        || $.F[8] !== `y`
+        $.F[2] !== Y
+        || $.F[4] !== Y
+        || $.F[6] !== Y
+        || $.F[8] !== Y
         ) {
 
-        while (($.F[2] === `y` && $.F[8] === `y`)
-        || ($.F[2] === `y` && $.F[6] === `y`)
-        || ($.F[4] === `y` && $.F[8] === `y`)
-        || ($.F[6] === `y` && $.F[8] === `y`)) {
+        while (($.F[2] === Y && $.F[8] === Y)
+        || ($.F[2] === Y && $.F[6] === Y)
+        || ($.F[4] === Y && $.F[8] === Y)
+        || ($.F[6] === Y && $.F[8] === Y)) {
             F_cw();
         }
 
@@ -748,17 +735,17 @@ const moveYellowCornersToTheirPlaces = () => {
     repeat(3, () => {
         repeat(4, () => {
             if (!(
-                    ($.R[5] === $.F[9] || $.R[5] === $.R[7] || $.R[5] === $.D[3])
-                    && ($.D[5] === $.F[9] || $.D[5] === $.R[7] || $.D[5] === $.D[3])
-                )) {
+                ($.R[5] === $.F[9] || $.R[5] === $.R[7] || $.R[5] === $.D[3])
+                && ($.D[5] === $.F[9] || $.D[5] === $.R[7] || $.D[5] === $.D[3])
+            )) {
                 MotorF_cw();
             }
         });
 
         if (!(
-                ($.U[5] === $.F[1] || $.U[5] === $.U[7] || $.U[5] === $.L[3])
-                && ($.L[5] === $.F[1] || $.L[5] === $.U[7] || $.L[5] === $.L[3])
-            )) {
+            ($.U[5] === $.F[1] || $.U[5] === $.U[7] || $.U[5] === $.L[3])
+            && ($.L[5] === $.F[1] || $.L[5] === $.U[7] || $.L[5] === $.L[3])
+        )) {
             F_cw();
             R_cw();
             F_ccw();
@@ -783,11 +770,11 @@ const moveYellowCornersToTheirPlaces = () => {
 const orientYellowCorners = () => {
     debug.currentOperation = `orientYellowCorners`;
     console.log(`Orient yellow corners`);
-    while (!($.F[1] === `y` && $.F[3] === `y` && $.F[7] === `y` && $.F[9] === `y`)) {
+    while (!($.F[1] === Y && $.F[3] === Y && $.F[7] === Y && $.F[9] === Y)) {
         console.log(`Orient yellow corner`);
         logCube($);
         repeat(4, () => {
-            if ($.F[9] !== 'y') {
+            if ($.F[9] !== Y) {
                 // R' D' R D
                 R_ccw();
                 B_ccw();
@@ -799,7 +786,7 @@ const orientYellowCorners = () => {
 
         console.log(`Rotate to next yellow corner not facing correctly`);
         repeat(4, () => {
-            if ($.F[9] === 'y') {
+            if ($.F[9] === Y) {
                 F_cw();
             }
         });

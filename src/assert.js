@@ -2,21 +2,28 @@
 
 import {logCube} from "./utils";
 
+const W = 1;
+const Y = 10;
+const O = 100;
+const R = 1000;
+const G = 10000;
+const B = 100000;
+
 console.error = function (...args) {
     console.log(`\x1b[31m${[...args].join(` `)}\x1b[0m`);
 };
 
 export default {
     whiteDaisy: function ($) {
-        if (!($.F[5] === `y` && $.F[2] === `w` && $.F[4] === `w` && $.F[6] === `w` && $.F[8] === `w`)) {
+        if (!($.F[5] === Y && $.F[2] === W && $.F[4] === W && $.F[6] === W && $.F[8] === W)) {
             console.error(`Wrong white daisy!`);
             logCube($);
             process.exit();
         }
     },
     whiteCross: function ($) {
-        if (!($.F[5] === `y`
-                && $.B[2] === `w` && $.B[4] === `w` && $.B[5] === `w` && $.B[6] === `w` && $.B[8] === `w`
+        if (!($.F[5] === Y
+                && $.B[2] === W && $.B[4] === W && $.B[5] === W && $.B[6] === W && $.B[8] === W
                 && $.U[2] === $.U[5]
                 && $.R[6] === $.R[5]
                 && $.D[8] === $.D[5]
@@ -29,7 +36,7 @@ export default {
     },
     whiteSide: function ($) {
         for (let i = 1; i <= 9; i++) {
-            if ($.B[i] !== `w`) {
+            if ($.B[i] !== W) {
                 console.error(`B isn't completely white!`);
                 logCube($);
                 process.exit();
@@ -70,7 +77,7 @@ export default {
     },
     yellowCross: function ($) {
         this.firstAndSecondLayer($);
-        if (!($.F[2] === `y` && $.F[4] === `y` && $.F[5] === `y` && $.F[6] === `y` && $.F[8] === `y`)) {
+        if (!($.F[2] === Y && $.F[4] === Y && $.F[5] === Y && $.F[6] === Y && $.F[8] === Y)) {
             console.error(`Wrong yellow cross!`);
             logCube($);
             process.exit();

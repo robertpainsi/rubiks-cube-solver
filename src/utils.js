@@ -4,15 +4,6 @@ import colorize from "./colorize";
 
 const {red, blue, green, orange, yellow} = colorize;
 
-const sideToArray = (side) => {
-    const result = [];
-    result.push(side.slice(1, 4));
-    result.push(side.slice(4, 7));
-    result.push(side.slice(7, 10));
-    result[2][2] = side[9]; // slice doesn't work for list (proxied array) with the last element.
-    return result;
-};
-
 export const logCube = ($) => {
     for (let i = 0; i < 3; i++) {
         let line = ``;
@@ -24,13 +15,35 @@ export const logCube = ($) => {
     console.log();
 };
 
+const sideToArray = (side) => {
+    const result = [];
+    result.push([side[1] || ' ', side[2] || ' ', side[3] || ' ']);
+    result.push([side[4] || ' ', side[5] || ' ', side[6] || ' ']);
+    result.push([side[7] || ' ', side[8] || ' ', side[9] || ' ']);
+    return result;
+};
+
+
+const W = 1;
+const Y = 10;
+const O = 100;
+const R = 1000;
+const G = 10000;
+const B = 100000;
+
 export const colorizeBlock = (b) => {
-    return b
-        .replace(/r/g, red(`r`))
-        .replace(/g/g, green(`g`))
+    return b.toString()
+        .replace(/100000/g, `b`)
+        .replace(/10000/g, `g`)
+        .replace(/1000/g, `r`)
+        .replace(/100/g, `o`)
+        .replace(/10/g, `y`)
+        .replace(/1/g, `w`)
         .replace(/b/g, blue(`b`))
-        .replace(/y/g, yellow(`y`))
-        .replace(/o/g, orange(`o`));
+        .replace(/g/g, green(`g`))
+        .replace(/r/g, red(`r`))
+        .replace(/o/g, orange(`o`))
+        .replace(/y/g, yellow(`y`));
 };
 
 export const shuffle = ($, commands) => {

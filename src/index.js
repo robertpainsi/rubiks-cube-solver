@@ -4,10 +4,32 @@ import {createList, repeat} from "./pocket-code";
 import {colorizeBlock, logCube, shuffle} from "./utils";
 import assert from "./assert";
 
+const debug = {
+    operations: {
+        makeDaisy: 0,
+        finishWhiteCross: 0,
+        finishWhiteFace: 0,
+        finishSecondLayer: 0,
+        finishYellowCross: 0,
+        finishYellowEdges: 0,
+        moveYellowCornersToTheirPlaces: 0,
+        orientYellowCorners: 0,
+        total: 0,
+    },
+    currentOperation: ``,
+};
+
+const FORWARD_TIME = 3;
+const BACKWARD_TIME = 5;
+const ROTATE_TIME = 7;
+
+const CUBE_TIME = 1;
+// const CUBE_TIME = 3 * FORWARD_TIME + 3 * BACKWARD_TIME + 3 * ROTATE_TIME;
+const FACE_TIME = 1;
+// const FACE_TIME = 1 * FORWARD_TIME + 1 * BACKWARD_TIME + 2 * ROTATE_TIME;
+
 /** Program variables/lists */
 const $ = {
-    horizontalEdges: createList(),
-
     F: createList(),
     B: createList(),
     L: createList(),
@@ -22,76 +44,128 @@ const $ = {
     UB: createList(),
     DB: createList(),
 
+    horizontalEdges: createList(),
+
     moveFaceToFColor: 0,
 };
 
-/** Command handler */
-// Turn cube clockwise on X-axis
-const TA = () => {
+const W = 1;
+const Y = 10;
+const O = 100;
+const R = 1000;
+const G = 10000;
+const B = 100000;
+
+/** Motor commands handler */
+const MotorF_cw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`MotorF_cw`);
+        debug.operations[debug.currentOperation] += CUBE_TIME;
+    }
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
-            let newIndex = 9 - (3 * (k - 1)) - (3 - i);
-            $.FB[index] = $.F[newIndex];
-            $.LB[index] = $.D[newIndex];
-            $.RB[index] = $.U[newIndex];
-            $.UB[index] = $.L[newIndex];
-            $.DB[index] = $.R[newIndex];
+            let oppositeIndex = 9 - (index - 1);
+            let cwIndex = k * 3 - (i - 1);
+            let ccwIndex = 9 - (3 * (k - 1)) - (3 - i);
 
-            newIndex = k * 3 - (i - 1);
-            $.BB[index] = $.B[newIndex];
+            $.FB[cwIndex] = $.F[index];
+            $.RB[cwIndex] = $.U[index];
+            $.BB[ccwIndex] = $.B[index];
+            $.LB[cwIndex] = $.D[index];
+            $.UB[cwIndex] = $.L[index];
+            $.DB[cwIndex] = $.R[index];
         }
     }
     restoreCube();
 };
-
-// Turn cube counterclockwise on X-axis
-const TAP = () => {
-    TA();
-    TA();
-    TA();
+const MotorF_ccw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`MotorF_ccw`);
+        debug.operations[debug.currentOperation] += CUBE_TIME;
+    }
+    MotorF_cw(true);
+    MotorF_cw(true);
+    MotorF_cw(true);
 };
 
-// Turn cube clockwise on Y-axis
-const TB = () => {
+const MotorB_cw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`MotorB_cw`);
+        debug.operations[debug.currentOperation] += CUBE_TIME;
+    }
+    MotorF_ccw(true);
+};
+const MotorB_ccw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`MotorB_ccw`);
+        debug.operations[debug.currentOperation] += CUBE_TIME;
+    }
+    MotorF_cw(true);
+};
+
+const MotorR_cw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`MotorR_cw`);
+        debug.operations[debug.currentOperation] += CUBE_TIME;
+    }
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
-            $.FB[index] = $.L[index];
-            $.BB[index] = $.R[index];
-            $.LB[index] = $.B[index];
-            $.RB[index] = $.F[index];
+            let oppositeIndex = 9 - (index - 1);
+            let cwIndex = k * 3 - (i - 1);
+            let ccwIndex = 9 - (3 * (k - 1)) - (3 - i);
 
-            let newIndex = k * 3 - (i - 1);
-            $.UB[index] = $.U[newIndex];
-            newIndex = 9 - (3 * (k - 1)) - (3 - i);
-            $.DB[index] = $.D[newIndex];
+            $.FB[index] = $.D[index];
+            $.RB[cwIndex] = $.R[index];
+            $.BB[oppositeIndex] = $.U[index];
+            $.LB[ccwIndex] = $.L[index];
+            $.UB[index] = $.F[index];
+            $.DB[oppositeIndex] = $.B[index];
         }
     }
     restoreCube();
 };
-
-// Turn cube counterclockwise on Y-axis
-const TBP = () => {
-    TB();
-    TB();
-    TB();
+const MotorR_ccw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`MotorR_ccw`);
+        debug.operations[debug.currentOperation] += CUBE_TIME;
+    }
+    MotorR_cw(true);
+    MotorR_cw(true);
+    MotorR_cw(true);
 };
 
-// Turn F clockwise
-const TAHB = () => {
+const MotorL_cw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`MotorL_cw`);
+        debug.operations[debug.currentOperation] += CUBE_TIME;
+    }
+    MotorR_ccw(true);
+};
+const MotorL_ccw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`MotorL_ccw`);
+        debug.operations[debug.currentOperation] += CUBE_TIME;
+    }
+    MotorR_cw(true);
+};
+
+const F_cw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`F_cw`);
+        debug.operations[debug.currentOperation] += FACE_TIME;
+    }
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
-            let newIndex = 9 - (3 * (k - 1)) - (3 - i);
-            $.FB[index] = $.F[newIndex];
+            let oppositeIndex = 9 - (index - 1);
+            let cwIndex = k * 3 - (i - 1);
+            let ccwIndex = 9 - (3 * (k - 1)) - (3 - i);
+
+            $.FB[cwIndex] = $.F[index];
         }
     }
-
-    $.LB[3] = $.D[1];
-    $.LB[6] = $.D[2];
-    $.LB[9] = $.D[3];
-
     $.RB[1] = $.U[7];
     $.RB[4] = $.U[8];
     $.RB[7] = $.U[9];
@@ -100,70 +174,174 @@ const TAHB = () => {
     $.UB[8] = $.L[6];
     $.UB[9] = $.L[3];
 
+    $.LB[3] = $.D[1];
+    $.LB[6] = $.D[2];
+    $.LB[9] = $.D[3];
+
     $.DB[1] = $.R[7];
     $.DB[2] = $.R[4];
     $.DB[3] = $.R[1];
     restoreCube();
 };
-
-// Turn F counterclockwise
-const TAPHB = () => {
-    TAHB();
-    TAHB();
-    TAHB();
+const F_ccw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`F_ccw`);
+        debug.operations[debug.currentOperation] += FACE_TIME;
+    }
+    F_cw(true);
+    F_cw(true);
+    F_cw(true);
 };
 
-// Turn D clockwise
-const TBHA = () => {
+const B_cw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`B_cw`);
+        debug.operations[debug.currentOperation] += FACE_TIME;
+    }
     for (let i = 1; i <= 3; i++) {
         for (let k = 1; k <= 3; k++) {
             let index = (i - 1) * 3 + k;
-            let newIndex = 9 - (3 * (k - 1)) - (3 - i);
-            $.DB[index] = $.D[newIndex];
+            let oppositeIndex = 9 - (index - 1);
+            let cwIndex = k * 3 - (i - 1);
+            let ccwIndex = 9 - (3 * (k - 1)) - (3 - i);
 
-            if (index >= 7) {
-                $.FB[index] = $.L[index];
-                $.LB[index] = $.B[index];
-                $.BB[index] = $.R[index];
-                $.RB[index] = $.F[index];
-            }
+            $.BB[cwIndex] = $.B[index];
         }
     }
+    $.RB[3] = $.D[9];
+    $.RB[6] = $.D[8];
+    $.RB[9] = $.D[7];
+
+    $.UB[1] = $.R[3];
+    $.UB[2] = $.R[6];
+    $.UB[3] = $.R[9];
+
+    $.LB[1] = $.U[3];
+    $.LB[4] = $.U[2];
+    $.LB[7] = $.U[1];
+
+    $.DB[7] = $.L[1];
+    $.DB[8] = $.L[4];
+    $.DB[9] = $.L[7];
     restoreCube();
 };
-
-// Turn D counterclockwise
-const TBPHA = () => {
-    TBHA();
-    TBHA();
-    TBHA();
-};
-
-/** Command utils */
-const moveFaceToF = () => {
-    for (let i = 0; i < 2; i++) { // repeat 2 times
-        for (let j = 0; j < 4; j++) { // repeat 4 times
-            if ($.F[5] === $.moveFaceToFColor) {
-                return;
-            }
-            TB();
-        }
-        TA();
+const B_ccw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`B_ccw`);
+        debug.operations[debug.currentOperation] += FACE_TIME;
     }
+    B_cw(true);
+    B_cw(true);
+    B_cw(true);
 };
 
-const righty = () => {
-    TAHB();
-    TBHA();
-    TAPHB();
-    TBPHA();
+const R_cw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`R_cw`);
+        debug.operations[debug.currentOperation] += FACE_TIME;
+    }
+    for (let i = 1; i <= 3; i++) {
+        for (let k = 1; k <= 3; k++) {
+            let index = (i - 1) * 3 + k;
+            let oppositeIndex = 9 - (index - 1);
+            let cwIndex = k * 3 - (i - 1);
+            let ccwIndex = 9 - (3 * (k - 1)) - (3 - i);
+
+            $.RB[cwIndex] = $.R[index];
+        }
+    }
+    $.FB[3] = $.D[3];
+    $.FB[6] = $.D[6];
+    $.FB[9] = $.D[9];
+
+    $.UB[3] = $.F[3];
+    $.UB[6] = $.F[6];
+    $.UB[9] = $.F[9];
+
+    $.BB[1] = $.U[9];
+    $.BB[4] = $.U[6];
+    $.BB[7] = $.U[3];
+
+    $.DB[3] = $.B[7];
+    $.DB[6] = $.B[4];
+    $.DB[9] = $.B[1];
+    restoreCube();
+};
+const R_ccw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`R_ccw`);
+        debug.operations[debug.currentOperation] += FACE_TIME;
+    }
+    R_cw(true);
+    R_cw(true);
+    R_cw(true);
 };
 
-const lefty = () => {
-    TAPHB();
-    TBHA();
-    TAHB();
-    TBPHA();
+const L_cw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`L_cw`);
+        debug.operations[debug.currentOperation] += FACE_TIME;
+    }
+    for (let i = 1; i <= 3; i++) {
+        for (let k = 1; k <= 3; k++) {
+            let index = (i - 1) * 3 + k;
+            let oppositeIndex = 9 - (index - 1);
+            let cwIndex = k * 3 - (i - 1);
+            let ccwIndex = 9 - (3 * (k - 1)) - (3 - i);
+
+            $.LB[cwIndex] = $.L[index];
+        }
+    }
+    $.FB[1] = $.U[1];
+    $.FB[4] = $.U[4];
+    $.FB[7] = $.U[7];
+
+    $.UB[1] = $.B[9];
+    $.UB[4] = $.B[6];
+    $.UB[7] = $.B[3];
+
+    $.BB[3] = $.D[7];
+    $.BB[6] = $.D[4];
+    $.BB[9] = $.D[1];
+
+    $.DB[1] = $.F[1];
+    $.DB[4] = $.F[4];
+    $.DB[7] = $.F[7];
+    restoreCube();
+};
+const L_ccw = (alreadyLogged) => {
+    if (!alreadyLogged) {
+        console.log(`L_ccw`);
+        debug.operations[debug.currentOperation] += FACE_TIME;
+    }
+    L_cw(true);
+    L_cw(true);
+    L_cw(true);
+};
+
+/** Motor command utils */
+const moveFaceToF = () => {
+    if ($.F[5] === $.moveFaceToFColor) {
+        return;
+    }
+
+    if ($.B[5] === $.moveFaceToFColor) {
+        MotorR_cw();
+        MotorR_cw();
+        return;
+    }
+
+    repeat(2, () => {
+        if ($.U[5] === $.moveFaceToFColor) {
+            MotorR_ccw();
+            return true;
+        }
+        if ($.D[5] === $.moveFaceToFColor) {
+            MotorR_cw();
+            return true;
+        }
+        MotorF_cw();
+    });
 };
 
 /** Data utils */
@@ -190,89 +368,103 @@ const restoreCube = () => {
 };
 
 /** Main logic */
+const main = () => {
+    const RUNS = 1;
+    for (let run = 1; run <= RUNS; run++) {
+        console.log(`RUN #${run} ------------------------------------------------------------------------------------`);
+        setup();
+        readCubeColors();
+        makeDaisy();
+        finishWhiteCross();
+        finishWhiteFace();
+        finishSecondLayer();
+        finishYellowCross();
+        finishYellowEdges();
+        moveYellowCornersToTheirPlaces();
+        orientYellowCorners();
+
+        assert.cube($);
+    }
+
+    for (let [key, value] of Object.entries(debug.operations)) {
+        if (key === `total`) {
+            continue;
+        }
+        debug.operations.total += value;
+    }
+
+    for (let [key, value] of Object.entries(debug.operations)) {
+        console.log(`${(value / RUNS)} operations for ${key}`);
+    }
+};
+
+/** Step: Setup */
 const setup = () => {
     for (let i = 1; i <= 9; i++) {
-        $.F[i] = `w`;
-        $.B[i] = `y`;
-        $.L[i] = `b`;
-        $.R[i] = `g`;
-        $.U[i] = `r`;
-        $.D[i] = `o`;
+        $.F[i] = W;
+        $.B[i] = Y;
+        $.L[i] = B;
+        $.R[i] = G;
+        $.U[i] = R;
+        $.D[i] = O;
+
+        $.FB[i] = $.F[i];
+        $.BB[i] = $.B[i];
+        $.LB[i] = $.L[i];
+        $.RB[i] = $.R[i];
+        $.UB[i] = $.U[i];
+        $.DB[i] = $.D[i];
     }
     backupCube();
 
-    $.horizontalEdges.push(`b`);
-    $.horizontalEdges.push(`o`);
-    $.horizontalEdges.push(`o`);
-    $.horizontalEdges.push(`g`);
-    $.horizontalEdges.push(`g`);
-    $.horizontalEdges.push(`r`);
-    $.horizontalEdges.push(`r`);
-    $.horizontalEdges.push(`b`);
-};
-const main = () => {
-    setup();
-    readCubeColors();
-    makeDaisy();
-    finishWhiteCross();
-    finishWhiteFace();
-    finishSecondLayer();
-    finishYellowCross();
-    finishYellowEdges();
-    moveYellowCornersToTheirPlaces();
-    orientYellowCorners();
-
-    assert.cube($);
+    $.horizontalEdges.push(B);
+    $.horizontalEdges.push(O);
+    $.horizontalEdges.push(O);
+    $.horizontalEdges.push(G);
+    $.horizontalEdges.push(G);
+    $.horizontalEdges.push(R);
+    $.horizontalEdges.push(R);
+    $.horizontalEdges.push(B);
 };
 
 /** Step: Read cube colors */
 const readCubeColors = () => {
-    // TODO: Only for Javascript testing. Implement block for Catrobat.
-    shuffle($, [TA, TAP, TB, TBP, TAHB, TAPHB, TBHA, TBPHA]);
+    // TODO: Only for Javascript testing. Remove in Pocket Code.
+    console.log(`Shuffle cube`);
+    shuffle($, [
+        F_cw, F_ccw, MotorF_cw, MotorF_ccw,
+        B_cw, B_ccw, MotorB_cw, MotorB_ccw,
+        L_cw, L_ccw, MotorL_cw, MotorL_ccw,
+        R_cw, R_ccw, MotorR_cw, MotorR_ccw,
+    ]);
     logCube($);
 };
 
 /** Step: Make daisy */
 const makeDaisy = () => {
+    debug.currentOperation = `makeDaisy`;
     console.log(`Make daisy`);
-    moveFaceToF($.moveFaceToFColor = `y`);
-    while ($.F[2] !== `w` || $.F[4] !== `w` || $.F[6] !== `w` || $.F[8] !== `w`) {
-        if ($.B[2] === `w` || $.B[4] === `w` || $.B[6] === `w` || $.B[8] === `w`) {
-            // console.log(`Move white tile from back to yellow front`);
-            TB();
-            TB();
-            while ($.F[8] !== `w`) {
-                TAHB();
+    moveFaceToF($.moveFaceToFColor = Y);
+    while ($.F[2] !== W || $.F[4] !== W || $.F[6] !== W || $.F[8] !== W) {
+        if ($.U[6] === W || $.D[6] === W || $.B[4] === W) {
+            while ($.F[6] === W) {
+                F_cw();
             }
-            TB();
-            TB();
-            while ($.F[8] === `w`) {
-                TAHB();
+            while ($.F[6] !== W) {
+                R_cw();
             }
-            TBHA();
-            TBHA();
-        } else {
-            // console.log(`Move white tile from side to yellow front face`);
-            while ($.D[2] !== `w` && $.D[4] !== `w` && $.D[6] !== `w` && $.D[8] !== `w`) {
-                TA();
-            }
-            while ($.F[8] === `w`) {
-                TAHB();
-            }
-            while ($.D[4] !== `w`) {
-                TBHA();
-            }
-            TA();
-            TA();
-            TA();
-
-            while ($.F[8] === `w`) { // optional?
-                TAHB();
-            }
-
-            TBPHA();
         }
-        moveFaceToF($.moveFaceToFColor = `y`);
+
+        if ($.R[4] === W) {
+            R_cw();
+        } else if ($.R[6] === W) {
+            while ($.F[6] === W) {
+                F_cw();
+            }
+            R_cw();
+        }
+
+        MotorF_cw();
     }
     logCube($);
 
@@ -281,17 +473,24 @@ const makeDaisy = () => {
 
 /** Step: Finish white cross */
 const finishWhiteCross = () => {
+    debug.currentOperation = `finishWhiteCross`;
     console.log(`Finish white cross`);
-    repeat(4, () => {
-        while (!($.F[8] === `w` && $.D[2] === $.D[5])) {
-            TAHB();
+    while ($.F[2] === W || $.F[4] === W || $.F[6] === W || $.F[8] === W) {
+        logCube($);
+
+        while ($.R[5] !== $.R[6] || $.B[4] !== W) {
+            if ($.F[6] === W && $.R[4] === $.R[5]) {
+                R_cw();
+                R_cw();
+            }
+            if ($.F[2] === W && $.U[8] === $.R[5]) {
+                F_cw();
+            } else {
+                F_ccw();
+            }
         }
-        TBHA();
-        TBHA();
-        TA();
-    });
-    TB();
-    TA();
+        MotorF_cw();
+    }
     logCube($);
 
     assert.whiteCross($);
@@ -299,45 +498,65 @@ const finishWhiteCross = () => {
 
 /** Step: Finish white face */
 const finishWhiteFace = () => {
+    debug.currentOperation = `finishWhiteFace`;
     console.log(`Finish white face`);
     for (let i = 1; i <= 4; i++) {
         const c1 = $.horizontalEdges[(i - 1) * 2 + 1];
         const c2 = $.horizontalEdges[(i - 1) * 2 + 2];
+        const piece = W + c1 + c2;
 
         console.log(`Finish white corners`, colorizeBlock(c1), colorizeBlock(c2));
         logCube($);
 
         console.log(`Move away from white face`);
-        repeat(4, () => {
-            if (
-                ($.F[3] === `w` || $.U[9] === `w` || $.R[1] === `w`) &&
-                ($.F[3] === c1 || $.U[9] === c1 || $.R[1] === c1) &&
-                ($.F[3] === c2 || $.U[9] === c2 || $.R[1] === c2)
-            ) {
-                righty();
-            } else {
-                TB();
-            }
-        });
-        logCube($);
+        if (
+            piece === $.B[7] + $.R[9] + $.D[9] ||
+            piece === $.B[1] + $.R[3] + $.U[3] ||
+            piece === $.B[9] + $.L[7] + $.D[7] ||
+            piece === $.B[3] + $.L[1] + $.U[1]
+        ) {
+            repeat(4, () => {
+                if (piece === $.B[7] + $.R[9] + $.D[9]) {
+                    R_cw();
+                    F_cw();
+                    R_ccw();
+                } else {
+                    MotorF_cw();
+                }
+            })
+        }
 
-        console.log('Colored corner on correct faces, F,U,R = F,R,`w`');
-        while ($.F[5] !== c1) {
-            TB();
+        console.log(`Colored corner on correct faces, F,U,R = F,R,w`);
+        while ($.R[5] !== c1) {
+            MotorF_cw();
         }
         logCube($);
-        while (!(
-            ($.F[9] === `w` || $.D[3] === `w` || $.R[7] === `w`) &&
-            ($.F[9] === c1 || $.D[3] === c1 || $.R[7] === c1) &&
-            ($.F[9] === c2 || $.D[3] === c2 || $.R[7] === c2)
-        )) {
-            TBHA();
+        while (piece !== $.F[9] + $.D[3] + $.R[7]) {
+            F_cw();
+            logCube($);
         }
         logCube($);
 
-        console.log('Fix white corner');
-        while ($.U[9] !== `w` || $.F[3] !== $.F[5] || $.R[1] !== $.R[5]) {
-            righty();
+        console.log(`Fix white corner`);
+        if ($.D[3] === W) {
+            F_cw();
+            R_cw();
+            F_ccw();
+            R_ccw();
+        } else if ($.R[7] === W) {
+            R_cw();
+            F_cw();
+            R_ccw();
+        } else {
+            F_cw();
+            R_cw();
+            F_ccw();
+            F_ccw();
+            R_ccw();
+            F_cw();
+            R_cw();
+            F_ccw();
+            R_ccw();
         }
         logCube($);
 
@@ -349,55 +568,88 @@ const finishWhiteFace = () => {
 
 /** Step: Finish second layer */
 const finishSecondLayer = () => {
-    console.log(`Finish second layer`); // TODO: Add comments and cube logs
+    debug.currentOperation = `finishSecondLayer`;
+    console.log(`Finish second layer`);
     for (let i = 1; i <= 4; i++) {
         const c1 = $.horizontalEdges[(i - 1) * 2 + 1];
         const c2 = $.horizontalEdges[(i - 1) * 2 + 2];
+        const piece = c1 + c2;
 
         console.log(`Finish second layer colors`, colorizeBlock(c1), colorizeBlock(c2));
         logCube($);
 
-        repeat(4, () => {
-            if (($.F[6] === c1 || $.F[6] === c2) && ($.R[4] === c1 || $.R[4] === c2)) {
-                righty();
-                righty();
-                TBPHA();
-                righty();
-                righty();
-                righty();
-                righty();
-            } else {
-                TB();
-            }
-        });
+        if (
+            piece === $.R[8] + $.D[6] ||
+            piece === $.R[2] + $.U[6] ||
+            piece === $.L[8] + $.D[4] ||
+            piece === $.L[2] + $.U[4]
+        ) {
+            repeat(4, () => {
+                if (piece === $.R[8] + $.D[6]) {
+                    R_cw();
+                    F_cw();
+                    R_ccw();
+                    F_ccw();
 
-        while (!(($.F[8] === c1 || $.F[8] === c2) && ($.D[2] === c1 || $.D[2] === c2))) {
-            TBHA();
+                    R_cw();
+                    F_cw();
+                    R_ccw();
+                    F_ccw();
+
+                    F_cw();
+                    F_cw();
+
+                    R_cw();
+                    F_ccw();
+                    R_ccw();
+                    F_cw();
+
+                    R_cw();
+                    F_ccw();
+                    R_ccw();
+                    F_cw();
+                } else {
+                    MotorF_cw();
+                }
+            });
         }
-        while (!($.F[5] === $.F[8] && ($.F[5] === c1 || $.F[5] === c2))) {
-            TBHA();
-            TBP();
+
+        while (piece !== $.F[8] + $.D[2]) {
+            F_cw();
         }
-        if ($.L[5] === c1 || $.L[5] === c2) {
-            TBHA();
-            TBHA();
-            lefty();
-            lefty();
-            TBHA();
-            lefty();
-            lefty();
-            lefty();
-            lefty();
-        } else if ($.R[5] === c1 || $.R[5] === c2) {
-            TBHA();
-            TBHA();
-            righty();
-            righty();
-            TBHA();
-            righty();
-            righty();
-            righty();
-            righty();
+        while ($.D[2] !== $.D[5]) {
+            MotorF_cw();
+            F_ccw();
+        }
+
+        if ($.R[5] === c1 || $.R[5] === c2) {
+            // U R U' R'
+            F_cw();
+            R_cw();
+            F_ccw();
+            R_ccw();
+
+            // U' F' U F
+            MotorF_ccw();
+            F_ccw();
+            R_ccw();
+            F_cw();
+            R_cw();
+            MotorF_cw();
+        } else if ($.L[5] === c1 || $.L[5] === c2) {
+            // U' L' U L
+            F_ccw();
+            L_ccw();
+            F_cw();
+            L_cw();
+
+            // U F U' F'
+            MotorF_ccw();
+            F_cw();
+            R_cw();
+            F_ccw();
+            R_ccw();
+            MotorF_cw();
         }
 
         assert.ts($);
@@ -409,26 +661,32 @@ const finishSecondLayer = () => {
 
 /** Step: Finish yellow cross */
 const finishYellowCross = () => {
+    debug.currentOperation = `finishYellowCross`;
     console.log(`Finish yellow cross`);
     while (
-        $.D[2] !== `y`
-        || $.D[4] !== `y`
-        || $.D[6] !== `y`
-        || $.D[8] !== `y`
+        $.F[2] !== Y
+        || $.F[4] !== Y
+        || $.F[6] !== Y
+        || $.F[8] !== Y
         ) {
 
-        while (($.D[2] === `y` && $.D[8] === `y`)
-        || ($.D[2] === `y` && $.D[4] === `y`)
-        || ($.D[2] === `y` && $.D[6] === `y`)
-        || ($.D[4] === `y` && $.D[8] === `y`)) {
-            TB();
+        while (($.F[2] === Y && $.F[8] === Y)
+        || ($.F[2] === Y && $.F[6] === Y)
+        || ($.F[4] === Y && $.F[8] === Y)
+        || ($.F[6] === Y && $.F[8] === Y)) {
+            F_cw();
         }
 
-        TAHB();
-        TB();
-        righty();
-        TBP();
-        TAPHB();
+        MotorR_cw();
+        F_cw();
+        MotorR_ccw();
+        R_cw();
+        F_cw();
+        R_ccw();
+        F_ccw();
+        MotorR_cw();
+        F_ccw();
+        MotorR_ccw();
 
         assert.firstAndSecondLayer($);
     }
@@ -439,28 +697,28 @@ const finishYellowCross = () => {
 
 /** Step: Finish yellow edges */
 const finishYellowEdges = () => {
+    debug.currentOperation = `finishYellowEdges`;
     console.log(`Finish yellow edges`);
-    while (!(
-        ($.F[5] === $.F[8])
-        && ($.B[5] === $.B[8])
-        && ($.L[5] === $.L[8])
-        && ($.R[5] === $.R[8])
-    )) {
-        if ($.R[5] !== $.R[8]) {
+    while (!($.U[8] === $.U[5] && $.R[4] === $.R[5] && $.D[2] === $.D[5] && $.L[6] === $.L[5])) {
+        if ($.D[2] !== $.D[5]) {
             console.log(`Swap edges`);
-            TAHB();
-            TBHA();
-            TAPHB();
-            TBHA();
-            TAHB();
-            TBHA();
-            TBHA();
-            TAPHB();
-            TBHA();
+            // R U R' U
+            R_cw();
+            F_cw();
+            R_ccw();
+            F_cw();
+
+            // R U2 R' U
+            R_cw();
+            F_cw();
+            F_cw();
+            R_ccw();
+            F_cw();
+
             logCube($);
         }
         console.log(`Rotate cube`);
-        TB();
+        MotorF_cw();
         logCube($);
 
         assert.yellowCross($);
@@ -472,102 +730,70 @@ const finishYellowEdges = () => {
 
 /** Step: Move yellow corners to their places */
 const moveYellowCornersToTheirPlaces = () => {
+    debug.currentOperation = `moveYellowCornersToTheirPlaces`;
     console.log(`Move corners to their places`);
-    repeat(4, () => {
-        repeat(3, () => {
+    repeat(3, () => {
+        repeat(4, () => {
             if (!(
-                    ($.F[5] === $.F[9] || $.F[5] === $.R[7] || $.F[5] === $.D[3])
-                    && ($.R[5] === $.F[9] || $.R[5] === $.R[7] || $.R[5] === $.D[3])
-                )) {
-                logCube($);
-                console.log(`Rotate corner ${colorizeBlock($.F[9])}${colorizeBlock($.R[7])}${colorizeBlock($.D[3])} to match ${colorizeBlock($.F[5])}${colorizeBlock($.R[5])}`);
-
-                console.log(`    FRD(${colorizeBlock($.F[9])}${colorizeBlock($.R[7])}${colorizeBlock($.D[3])})`
-                    + ` BRD(${colorizeBlock($.B[7])}${colorizeBlock($.R[9])}${colorizeBlock($.D[9])})`
-                    + ` BLD(${colorizeBlock($.B[9])}${colorizeBlock($.L[7])}${colorizeBlock($.D[7])})`
-                    + ` FLD(${colorizeBlock($.F[7])}${colorizeBlock($.L[9])}${colorizeBlock($.D[1])})`
-                );
-
-                TBP();
-                //  U R U' L' U R' U' L
-                //  BRD-corner stays they same, other three D corners rotate
-                TBHA();
-                TAHB();
-                TBPHA();
-                TB();
-                TB();
-                TAPHB();
-                TB();
-                TB();
-                TBHA();
-                TAPHB();
-                TBPHA();
-                TB();
-                TB();
-                TAHB();
-                TB();
-                TB();
-                TB();
-                logCube($);
-
-                console.log(`    FRD(${colorizeBlock($.F[9])}${colorizeBlock($.R[7])}${colorizeBlock($.D[3])})`
-                    + ` BRD(${colorizeBlock($.B[7])}${colorizeBlock($.R[9])}${colorizeBlock($.D[9])})`
-                    + ` BLD(${colorizeBlock($.B[9])}${colorizeBlock($.L[7])}${colorizeBlock($.D[7])})`
-                    + ` FLD(${colorizeBlock($.F[7])}${colorizeBlock($.L[9])}${colorizeBlock($.D[1])})`
-                );
+                ($.R[5] === $.F[9] || $.R[5] === $.R[7] || $.R[5] === $.D[3])
+                && ($.D[5] === $.F[9] || $.D[5] === $.R[7] || $.D[5] === $.D[3])
+            )) {
+                MotorF_cw();
             }
         });
-        TB();
+
+        if (!(
+            ($.U[5] === $.F[1] || $.U[5] === $.U[7] || $.U[5] === $.L[3])
+            && ($.L[5] === $.F[1] || $.L[5] === $.U[7] || $.L[5] === $.L[3])
+        )) {
+            F_cw();
+            R_cw();
+            F_ccw();
+            L_ccw();
+            F_cw();
+            R_ccw();
+            F_ccw();
+            L_cw();
+        }
     });
     logCube($);
 
-    console.log(`Corners: FRD(${colorizeBlock($.F[9])}${colorizeBlock($.R[7])}${colorizeBlock($.D[3])})`
-        + ` BRD(${colorizeBlock($.B[7])}${colorizeBlock($.R[9])}${colorizeBlock($.D[9])})`
-        + ` BLD(${colorizeBlock($.B[9])}${colorizeBlock($.L[7])}${colorizeBlock($.D[7])})`
+    console.log(`Corners: FUL(${colorizeBlock($.F[1])}${colorizeBlock($.U[7])}${colorizeBlock($.L[3])})`
+        + ` FRU(${colorizeBlock($.F[3])}${colorizeBlock($.R[1])}${colorizeBlock($.U[9])})`
         + ` FLD(${colorizeBlock($.F[7])}${colorizeBlock($.L[9])}${colorizeBlock($.D[1])})`
+        + ` FDR(${colorizeBlock($.F[9])}${colorizeBlock($.D[3])}${colorizeBlock($.R[7])})`
     );
     assert.yellowCrossEdgesAndCorners($);
 };
 
 /** Step: Orient yellow corners */
 const orientYellowCorners = () => {
+    debug.currentOperation = `orientYellowCorners`;
     console.log(`Orient yellow corners`);
-    TA();
-    TA();
-    while (!($.U[1] === `y` && $.U[3] === `y` && $.U[7] === `y` && $.U[9] === `y`)) {
+    while (!($.F[1] === Y && $.F[3] === Y && $.F[7] === Y && $.F[9] === Y)) {
         console.log(`Orient yellow corner`);
         logCube($);
         repeat(4, () => {
-            if ($.U[9] !== 'y') {
+            if ($.F[9] !== Y) {
                 // R' D' R D
-                TBP();
-                TAPHB();
-                TB();
-                TBPHA();
-                TBP();
-                TAHB();
-                TB();
-                TBHA();
+                R_ccw();
+                B_ccw();
+                R_cw();
+                B_cw();
             }
         });
         logCube($);
 
         console.log(`Rotate to next yellow corner not facing correctly`);
-        TA();
-        TA();
         repeat(4, () => {
-            if ($.D[1] === 'y') {
-                TBPHA();
+            if ($.F[9] === Y) {
+                F_cw();
             }
         });
-        TA();
-        TA();
         logCube($);
     }
-    TA();
-    TA();
-    while ($.F[5] !== $.F[8]) {
-        TBHA();
+    while ($.R[4] !== $.R[5]) {
+        F_cw();
     }
     console.log(`Done`);
     logCube($);

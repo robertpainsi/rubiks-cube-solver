@@ -33,6 +33,10 @@ export const createList = (() => {
                 }
             } else if (prop === 'length') {
                 return obj.length;
+            } else if (prop === 'includes' || prop === 'contains') {
+                return function (v) {
+                    return obj.includes(v);
+                }
             } else {
                 return isIndex(prop) ? obj[prop - 1] : obj[prop];
             }

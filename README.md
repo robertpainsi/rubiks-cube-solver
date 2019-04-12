@@ -1,5 +1,8 @@
 # Rubik's Cube solver
-This Node.js JavaScript program solves a 3x3 Rubik's Cube by using features that are only available in Catrobat/Pocket Code. This way it can easily be converted and run on such environment. So some code may look odd or could be much more easily fixed in pure and modern JavaScript.
+This Node.js JavaScript program solves a 3x3 Rubik's Cube by using 4 motors* and features that are only available in Catrobat/Pocket Code. This way it can easily be converted and run on such environment. So some code may look odd or could be much more easily fixed in pure and modern JavaScript.
+
+
+*(an outdated but functional version only using 2 motors can be found at branch [2-motors](https://github.com/robertpainsi/rubiks-cube-solver/tree/2-motors))
 
 ### Setup
 ```

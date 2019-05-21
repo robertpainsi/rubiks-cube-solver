@@ -1,23 +1,15 @@
 {
   "name": "rubiks-cube-solver",
-  "version": "0.1.0",
-  "description": "",
-  "repository": "",
-  "main": "src/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "version": "1.0.0",
+  "description": "Rubik's cube solver written in JavaScript but only using Catrobat/Pocket Code/Scratch features",
+  "repository": "https://github.com/robertpainsi/rubiks-cube-solver",
   "author": "Robert Painsi",
   "license": "MIT",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node --experimental-modules --es-module-specifier-resolution=node --experimental-worker src/index.js"
+  },
   "dependencies": {},
-  "devDependencies": {
-    "@babel/cli": "^7.0.0-beta.49",
-    "@babel/core": "^7.0.0-beta.49",
-    "@babel/plugin-proposal-class-properties": "^7.0.0-beta.49",
-    "@babel/plugin-proposal-object-rest-spread": "^7.0.0-beta.49",
-    "@babel/plugin-proposal-optional-chaining": "^7.0.0-beta.49",
-    "@babel/preset-env": "^7.0.0-beta.49",
-    "@babel/register": "^7.0.0-beta.49",
-    "babel-loader": "^8.0.0-beta.3"
-  }
+  "devDependencies": {}
 }

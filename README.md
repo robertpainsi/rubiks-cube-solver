@@ -6,12 +6,12 @@ This Node.js JavaScript program solves a 3x3 Rubik's Cube by using 4 motors* and
 
 ### Setup
 ```
-npm instsall
+npm install
 ```
 
 ### Run
 ```
-node -r @babel/register src/index.js
+npm start
 ```
 
 ### Limitations because of Catrobat/Pocket Code and other notes:
